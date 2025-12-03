@@ -1,0 +1,104 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "type": "shell",
+        "label": "cmake-release",
+        "command": "cmake",
+        "args": [
+          "-S",
+          ".",
+          "-B",
+          "build",
+          "-G",
+          "MinGW Makefiles"
+        ],
+        "problemMatcher": []
+      },
+      {
+        "type": "shell",
+        "label": "cmake-debug",
+        "command": "cmake",
+        "args": [
+          "-S",
+          ".",
+          "-B",
+          "build",
+          "-DCMAKE_BUILD_TYPE=Debug",
+          "-DCMAKE_CXX_FLAGS_DEBUG=-g3",
+          "-G",
+          "MinGW Makefiles"
+        ],
+        "problemMatcher": []
+      },
+      {
+        "label": "make",
+        "group": {
+          "kind": "build",
+          "isDefault": true
+        },
+        "command": "cmake",
+        "args": [
+          "--build",
+          "build",
+          "-j4"
+        ]
+      },
+      {
+        "type": "shell",
+        "label": "del",
+        "command": "cmd",
+        "args": [
+          "/c",
+          "if exist webServer.exe del webServer.exe"
+        ]
+      },
+      {
+        "type": "shell",
+        "label": "move",
+        "command": "move",
+        "args": [
+          "build\\webServer.exe",
+          "."
+        ],
+        "problemMatcher": []
+      },
+      {
+        "label": "build-debug",
+        "dependsOrder": "sequence",
+        "dependsOn": [
+          "cmake-debug",
+          "make",
+          "del",
+          "move"
+        ]
+      },
+      {
+        "label": "build-release",
+        "dependsOrder": "sequence",
+        "dependsOn": [
+          "cmake-release",
+          "make",
+          "del",
+          "move"
+        ]
+      },
+      {
+        "label": "run",
+        "type": "shell",
+        "command": "./webServer.exe",
+        "problemMatcher": []
+      },
+      {
+        "label": "release",
+        "dependsOrder": "sequence",
+        "dependsOn": [
+          "build-release",
+          "run"
+        ],
+        "problemMatcher": []
+      }
+    ]
+  }
