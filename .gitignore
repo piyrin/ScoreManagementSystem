@@ -1,0 +1,17 @@
+# 编译产物
+bin/
+*.exe
+*.o
+*.out
+
+# 日志与数据库
+*.log
+bin/score_db.db
+
+# VSCode配置
+.vscode/
+*.code-workspace
+
+# Windows临时文件
+Thumbs.db
+.DS_Store
