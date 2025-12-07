@@ -4,7 +4,8 @@
             "name": "windows-gcc-x64",
             "includePath": [
                 "${workspaceFolder}/**",
-                "D:\\mingw\\xiaza\\x86_64-8.1.0-release-posix-seh-rt_v6-rev0\\mingw64\\include"
+                "${workspaceFolder}/lib/sqlite",
+                "D:\\mingw\\xiazai\\x86_64-8.1.0-release-posix-seh-rt_v6-rev0\\mingw64\\include"
             ],
             "compilerPath": "D:/mingw/xiazai/x86_64-8.1.0-release-posix-seh-rt_v6-rev0/mingw64/bin/g++.exe",
             "cStandard": "${default}",
