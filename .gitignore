@@ -1,0 +1,15 @@
+# Build artifacts
+*.exe
+*.dll
+*.o
+*.obj
+build/
+output/
+bin/
+
+# VS Code
+.vscode/
+
+# OS generated files
+.DS_Store
+Thumbs.db

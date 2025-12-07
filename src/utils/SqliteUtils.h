@@ -21,8 +21,8 @@ private:
     ~SqliteUtils();
 
     // 禁止拷贝构造和赋值
-    SqliteUtils(const SqlitUntils &) = delete;
-    SqliteUtils &operator=(const SqlitUntils &) = delete;
+    SqliteUtils(const SqliteUtils &) = delete;
+    SqliteUtils &operator=(const SqliteUtils &) = delete;
 
 public:
     // 公有静态函数，获取实例指针
