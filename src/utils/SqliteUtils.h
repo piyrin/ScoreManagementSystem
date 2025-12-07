@@ -7,26 +7,26 @@
 // 声明sqlite连接句柄
 struct sqlite3;
 
-class SqlitUtils
+class SqliteUtils
 {
 private:
     // 单例指针
-    static SqlitUntils *instance;
+    static SqliteUtils *instance;
     // sqlite数据库连接句柄
     sqlite3 *conn;
 
     // 私有构造函数：初始化数据库连接，从config获取数据
-    SqlitUtils();
+    SqliteUtils();
     // 私有析构函数：关闭数据库连接
-    ~SqlitUtils();
+    ~SqliteUtils();
 
     // 禁止拷贝构造和赋值
-    SqlitUtils(const SqlitUntils &) = delete;
-    SqlitUtils &operator=(const SqlitUntils &) = delete;
+    SqliteUtils(const SqlitUntils &) = delete;
+    SqliteUtils &operator=(const SqlitUntils &) = delete;
 
 public:
     // 公有静态函数，获取实例指针
-    static SqlitUtils *getInstance();
+    static SqliteUtils *getInstance();
 
     // 核心接口1：执行[增/删/改]sql(如插入用户，修改成绩)
     // 返回值：true=成功，false=失败
