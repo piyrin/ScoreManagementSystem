@@ -8,7 +8,7 @@
 class TeacherModel
 {
 private:
-    int id;
+    int id;                 //教师id
     std::string teacherNo;  // 教师工号
     std::string name;       // 教师姓名
     std::string gender;     // 教师性别
