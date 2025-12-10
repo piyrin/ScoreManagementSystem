@@ -1,0 +1,74 @@
+#include "CourseModel.h"
+#include <sstream>
+
+CourseModel::CourseModel() : id(0), credit(0), teacherId(0) {}
+
+CourseModel::CourseModel(const std::string &courseNo, const std::string &courseName, int credit, int teacherId, const std::string &description) :id(0), courseNo(courseNo), courseName(courseName), credit(credit), teacherId(teacherId), description(description) {}
+
+CourseModel::CourseModel(int id, const std::string &courseNo, const std::string &courseName, int credit, int teacherId, const std::string &description) : id(id), courseNo(courseNo), courseName(courseName), credit(credit), teacherId(teacherId), description(description) {}
+
+// Getter函数实现
+int CourseModel::getId() const
+{
+    return id;
+}
+std::string CourseModel::getCourseNo() const
+{
+    return courseNo;
+}
+std::string CourseModel::getCourseName() const
+{
+    return courseName;
+}
+int CourseModel::getCredit() const
+{
+    return credit;
+}
+int CourseModel::getTeacherId() const
+{
+    return teacherId;
+}
+std::string CourseModel::getDescription() const
+{
+    return description;
+}
+
+//Setter函数实现
+void CourseModel::setId(int id)
+{
+    this->id = id;
+}
+void CourseModel::setCourseNo(const std::string &courseNo)
+{
+    this->courseNo = courseNo;
+}
+void CourseModel::setCourseName(const std::string&courseName)
+{
+    this->courseName = courseName;
+}
+void CourseModel::setCredit(int credit)
+{
+    this->credit = credit;
+}
+void CourseModel::setTeacherId(int teacherId)
+{
+    this->teacherId = teacherId;
+}
+void CourseModel::setDescription(const std::string &description)
+{
+    this->description = description;
+}
+
+
+std::string CourseModel::toString() const
+{
+    std::stringstream ss;
+    ss << "CourseModel{id=" << id
+       << ", courseNo='" << courseNo
+       << "', courseName='" << courseName
+       << "', credit=" << credit // 突出显示学分（用于绩点计算）
+       << ", teacherId=" << teacherId
+       << ", description='" << description
+       << "'}";
+    return ss.str();
+}

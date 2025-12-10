@@ -1,6 +1,6 @@
 #ifndef COURSE_MODEL_H
 #define COURSE_MODEL_H
-#include<string>
+#include <string>
 
 class CourseModel
 {
@@ -21,7 +21,7 @@ public:
 
     // 带参构造函数（从数据库加载课程，包含完整ID）
     CourseModel(int id, const std::string &courseNo, const std::string &courseName, int credit, int teacherId, const std::string &description);
-    
+
     // Getter方法：获取私有成员变量的值
     int getId() const;
     std::string getCourseNo() const;
