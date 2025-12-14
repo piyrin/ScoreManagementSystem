@@ -1,0 +1,308 @@
+#include "ScoreDao.h"
+#include <iostream>
+#include <vector>
+#include <sqlite3.h>
+
+// 构造函数：初始化数据库连接
+ScoreDao::ScoreDao()
+{
+    // 通过SqliteUtils单例获取数据库连接
+    this->db = SqliteUtils::getInstance()->getDbConnection();
+    if (this->db == nullptr)
+    {
+        std::cerr << "ScoreDao初始化失败:数据库连接获取失败" << std::endl;
+    }
+    else
+    {
+        std::cout << "ScoreDao初始化成功:数据库连接已建立" << std::endl;
+    }
+}
+
+// 析构函数：释放资源（无需关连接）
+ScoreDao::~ScoreDao()
+{
+    std::cout << "ScoreDao资源释放" << std::endl;
+}
+
+// 1. 新增成绩
+bool ScoreDao::insert(const ScoreModel &score)
+{
+    if (this->db == nullptr)
+        return false;
+
+    // SQL语句：插入成绩数据（id自增，无需传入）
+    // 对应score表字段：studentId、courseId、teacherId、score、examTime
+    std::string sql = "INSERT INTO score (studentId, courseId, teacherId, score, examTime) "
+                      "VALUES (?, ?, ?, ?, ?);";
+
+    // 准备SQL语句
+    sqlite3_stmt *stmt = nullptr;
+    int ret = sqlite3_prepare_v2(this->db, sql.c_str(), -1, &stmt, nullptr);
+    if (ret != SQLITE_OK)
+    {
+        std::cerr << "ScoreDao插入失败:SQL准备错误 - " << sqlite3_errmsg(this->db) << std::endl;
+        sqlite3_finalize(stmt);
+        return false;
+    }
+
+    // 绑定参数（顺序与SQL字段一致）
+    sqlite3_bind_int(stmt, 1, score.getStudentId());                               // studentId（int）
+    sqlite3_bind_int(stmt, 2, score.getCourseId());                                // courseId（int）
+    sqlite3_bind_int(stmt, 3, score.getTeacherId());                               // teacherId（int）
+    sqlite3_bind_double(stmt, 4, score.getScore());                                // score（double，支持小数）
+    sqlite3_bind_text(stmt, 5, score.getExamTime().c_str(), -1, SQLITE_TRANSIENT); // examTime（字符串）
+
+    // 执行SQL（注意：studentId+courseId联合唯一，重复会失败）
+    ret = sqlite3_step(stmt);
+    sqlite3_finalize(stmt);
+
+    if (ret == SQLITE_DONE)
+    {
+        std::cout << "ScoreDao插入成功:" << score.toString() << std::endl;
+        return true;
+    }
+    else
+    {
+        std::cerr << "ScoreDao插入失败:执行错误（可能学生+课程重复）- " << sqlite3_errmsg(this->db) << std::endl;
+        return false;
+    }
+}
+
+// 2. 根据ID查询成绩
+ScoreModel ScoreDao::selectById(int id)
+{
+    if (this->db == nullptr)
+        return ScoreModel();
+
+    // SQL语句：根据id查询成绩
+    std::string sql = "SELECT id, studentId, courseId, teacherId, score, examTim FROM score WHERE id = ?;";
+    sqlite3_stmt *stmt = nullptr;
+    int ret = sqlite3_prepare_v2(this->db, sql.c_str(), -1, &stmt, nullptr);
+    if (ret != SQLITE_OK)
+    {
+        std::cerr << "ScoreDao查询失败:SQL准备错误 - " << sqlite3_errmsg(this->db) << std::endl;
+        sqlite3_finalize(stmt);
+        return ScoreModel();
+    }
+
+    // 绑定id参数
+    sqlite3_bind_int(stmt, 1, id);
+
+    // 执行查询并解析结果
+    ScoreModel score;
+    ret = sqlite3_step(stmt);
+    if (ret == SQLITE_ROW)
+    {
+        // 从结果集提取字段（顺序与SQL查询字段一致）
+        int dbId = sqlite3_column_int(stmt, 0);
+        int studentId = sqlite3_column_int(stmt, 1);
+        int courseId = sqlite3_column_int(stmt, 2);
+        int teacherId = sqlite3_column_int(stmt, 3);
+        double scoreVal = sqlite3_column_double(stmt, 4);
+        std::string examTime = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 5));
+
+        // 构造ScoreModel对象（含id）
+        score = ScoreModel(dbId, studentId, courseId, scoreVal, examTime, teacherId);
+    }
+    else
+    {
+        std::cout << "ScoreDao查询失败:未找到ID为" << id << "的成绩" << std::endl;
+    }
+
+    sqlite3_finalize(stmt);
+    return score;
+}
+
+// 3. 根据学生ID查询成绩列表
+std::vector<ScoreModel> ScoreDao::selectByStudentId(int studentId)
+{
+    std::vector<ScoreModel> scoreList;
+    if (this->db == nullptr)
+        return scoreList;
+
+    // SQL语句：根据studentId查询该学生的所有成绩
+    std::string sql = "SELECT id, studentId, courseId, teacherId, score, examTime FROM score WHERE studentId = ?;";
+    sqlite3_stmt *stmt = nullptr;
+    int ret = sqlite3_prepare_v2(this->db, sql.c_str(), -1, &stmt, nullptr);
+    if (ret != SQLITE_OK)
+    {
+        std::cerr << "ScoreDao查询失败:SQL准备错误 - " << sqlite3_errmsg(this->db) << std::endl;
+        sqlite3_finalize(stmt);
+        return scoreList;
+    }
+
+    // 绑定学生ID参数
+    sqlite3_bind_int(stmt, 1, studentId);
+
+    // 循环解析结果集
+    while ((ret = sqlite3_step(stmt)) == SQLITE_ROW)
+    {
+        int dbId = sqlite3_column_int(stmt, 0);
+        int dbStudentId = sqlite3_column_int(stmt, 1);
+        int dbCourseId = sqlite3_column_int(stmt, 2);
+        int dbTeacherId = sqlite3_column_int(stmt, 3);
+        double scoreVal = sqlite3_column_double(stmt, 4);
+        std::string examTime = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 5));
+
+        // 构造ScoreModel对象并加入列表
+        ScoreModel score(dbId, dbStudentId, dbCourseId, scoreVal, examTime, dbTeacherId);
+        scoreList.emplace_back(score);
+    }
+
+    sqlite3_finalize(stmt);
+    std::cout << "ScoreDao查询成功:学生ID=" << studentId << "，共找到" << scoreList.size() << "条成绩" << std::endl;
+    return scoreList;
+}
+
+// 4. 根据课程ID查询成绩列表
+std::vector<ScoreModel> ScoreDao::selectByCourseId(int courseId)
+{
+    std::vector<ScoreModel> scoreList;
+    if (this->db == nullptr)
+        return scoreList;
+
+    // SQL语句：根据courseId查询该课程的所有成绩
+    std::string sql = "SELECT id, studentId, courseId, teacherId, score, examTime FROM score WHERE courseId = ?;";
+    sqlite3_stmt *stmt = nullptr;
+    int ret = sqlite3_prepare_v2(this->db, sql.c_str(), -1, &stmt, nullptr);
+    if (ret != SQLITE_OK)
+    {
+        std::cerr << "ScoreDao查询失败:SQL准备错误 - " << sqlite3_errmsg(this->db) << std::endl;
+        sqlite3_finalize(stmt);
+        return scoreList;
+    }
+
+    // 绑定课程ID参数
+    sqlite3_bind_int(stmt, 1, courseId);
+
+    // 循环解析结果集
+    while ((ret = sqlite3_step(stmt)) == SQLITE_ROW)
+    {
+        int dbId = sqlite3_column_int(stmt, 0);
+        int dbStudentId = sqlite3_column_int(stmt, 1);
+        int dbCourseId = sqlite3_column_int(stmt, 2);
+        int dbTeacherId = sqlite3_column_int(stmt, 3);
+        double scoreVal = sqlite3_column_double(stmt, 4);
+        std::string examTime = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 5));
+
+        // 构造ScoreModel对象并加入列表
+        ScoreModel score(dbId, dbStudentId, dbCourseId, scoreVal, examTime, dbTeacherId);
+        scoreList.emplace_back(score);
+    }
+
+    sqlite3_finalize(stmt);
+    std::cout << "ScoreDao查询成功:课程ID=" << courseId << "，共找到" << scoreList.size() << "条成绩" << std::endl;
+    return scoreList;
+}
+
+// 5. 查询所有成绩
+std::vector<ScoreModel> ScoreDao::selectAll()
+{
+    std::vector<ScoreModel> scoreList;
+    if (this->db == nullptr)
+        return scoreList;
+
+    // SQL语句：查询所有成绩
+    std::string sql = "SELECT id, studentId, courseId, teacherId, score, examTime FROM score;";
+    sqlite3_stmt *stmt = nullptr;
+    int ret = sqlite3_prepare_v2(this->db, sql.c_str(), -1, &stmt, nullptr);
+    if (ret != SQLITE_OK)
+    {
+        std::cerr << "ScoreDao查询失败:SQL准备错误 - " << sqlite3_errmsg(this->db) << std::endl;
+        sqlite3_finalize(stmt);
+        return scoreList;
+    }
+
+    // 循环解析结果集
+    while ((ret = sqlite3_step(stmt)) == SQLITE_ROW)
+    {
+        int dbId = sqlite3_column_int(stmt, 0);
+        int dbStudentId = sqlite3_column_int(stmt, 1);
+        int dbCourseId = sqlite3_column_int(stmt, 2);
+        int dbTeacherId = sqlite3_column_int(stmt, 3);
+        double scoreVal = sqlite3_column_double(stmt, 4);
+        std::string examTime = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 5));
+
+        // 构造ScoreModel对象并加入列表
+        ScoreModel score(dbId, dbStudentId, dbCourseId, scoreVal, examTime, dbTeacherId);
+        scoreList.emplace_back(score);
+    }
+
+    sqlite3_finalize(stmt);
+    std::cout << "ScoreDao查询成功:共找到" << scoreList.size() << "条成绩" << std::endl;
+    return scoreList;
+}
+
+// 6. 更新成绩
+bool ScoreDao::update(const ScoreModel &score)
+{
+    if (this->db == nullptr || score.getId() == 0)
+        return false;
+
+    // SQL语句：根据id更新成绩信息（可更新分数、考试时间、备注）
+    std::string sql = "UPDATE score SET score = ?, examTime = ?, WHERE id = ?;";
+    sqlite3_stmt *stmt = nullptr;
+    int ret = sqlite3_prepare_v2(this->db, sql.c_str(), -1, &stmt, nullptr);
+    if (ret != SQLITE_OK)
+    {
+        std::cerr << "ScoreDao更新失败:SQL准备错误 - " << sqlite3_errmsg(this->db) << std::endl;
+        sqlite3_finalize(stmt);
+        return false;
+    }
+
+    // 绑定参数（顺序与SQL字段一致）
+    sqlite3_bind_double(stmt, 1, score.getScore());                                // 分数
+    sqlite3_bind_text(stmt, 2, score.getExamTime().c_str(), -1, SQLITE_TRANSIENT); // 考试时间
+    sqlite3_bind_int(stmt, 4, score.getId());                                      // 成绩ID（条件）
+
+    // 执行SQL
+    ret = sqlite3_step(stmt);
+    sqlite3_finalize(stmt);
+
+    if (ret == SQLITE_DONE)
+    {
+        std::cout << "ScoreDao更新成功:" << score.toString() << std::endl;
+        return true;
+    }
+    else
+    {
+        std::cerr << "ScoreDao更新失败:执行错误 - " << sqlite3_errmsg(this->db) << std::endl;
+        return false;
+    }
+}
+
+// 7. 根据ID删除成绩
+bool ScoreDao::deleteById(int id)
+{
+    if (this->db == nullptr)
+        return false;
+
+    // SQL语句：根据id删除成绩
+    std::string sql = "DELETE FROM score WHERE id = ?;";
+    sqlite3_stmt *stmt = nullptr;
+    int ret = sqlite3_prepare_v2(this->db, sql.c_str(), -1, &stmt, nullptr);
+    if (ret != SQLITE_OK)
+    {
+        std::cerr << "ScoreDao删除失败:SQL准备错误 - " << sqlite3_errmsg(this->db) << std::endl;
+        sqlite3_finalize(stmt);
+        return false;
+    }
+
+    // 绑定id参数
+    sqlite3_bind_int(stmt, 1, id);
+
+    // 执行SQL
+    ret = sqlite3_step(stmt);
+    sqlite3_finalize(stmt);
+
+    if (ret == SQLITE_DONE)
+    {
+        std::cout << "ScoreDao删除成功:ID为" << id << "的成绩" << std::endl;
+        return true;
+    }
+    else
+    {
+        std::cerr << "ScoreDao删除失败:执行错误 - " << sqlite3_errmsg(this->db) << std::endl;
+        return false;
+    }
+}
