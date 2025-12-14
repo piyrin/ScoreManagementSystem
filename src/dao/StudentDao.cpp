@@ -22,11 +22,12 @@ StudentDao::~StudentDao()
     std::cout << "StudentDao资源释放" << std::endl;
 }
 
-bool StudentDao::insert(const StudentModel&student)
+bool StudentDao::insert(const StudentModel &student)
 {
-    if(this->db==nullptr)
+    if (this->db == nullptr)
         return false;
-    std::string sql = "INSERT INTO student (studentNo, name, gender, major, grade, phone) " "VALUES (?, ?, ?, ?, ?, ?);";
+    std::string sql = "INSERT INTO student (studentNo, name, gender, major, grade, phone) "
+                      "VALUES (?, ?, ?, ?, ?, ?);";
     // 准备SQL语句
     sqlite3_stmt *stmt = nullptr;
     int ret = sqlite3_prepare_v2(this->db, sql.c_str(), -1, &stmt, nullptr);
@@ -51,7 +52,7 @@ bool StudentDao::insert(const StudentModel&student)
 
     if (ret == SQLITE_DONE)
     {
-        std::cout << "StudentDao插入成功:" << teacher.toString() << std::endl;
+        std::cout << "StudentDao插入成功:" << student.toString() << std::endl;
         return true;
     }
     else
@@ -61,11 +62,11 @@ bool StudentDao::insert(const StudentModel&student)
     }
 }
 
-//根据id查学生
+// 根据id查学生
 StudentModel StudentDao::selectById(int id)
 {
     if (this->db == nullptr)
-        return TeacherModel();
+        return StudentModel();
     // SQL语句：根据id查询学生
     std::string sql = "SELECT id, studentNo, name, gender, major, grade, phone FROM student WHERE id = ?;";
     sqlite3_stmt *stmt = nullptr;
