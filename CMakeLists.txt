@@ -16,6 +16,12 @@ include_directories(
     lib/sqlite
 )
 
+# Find OpenSSL
+find_package(OpenSSL REQUIRED)
+if(OpenSSL_FOUND)
+    include_directories(${OPENSSL_INCLUDE_DIR})
+endif()
+
 # Source files
 file(GLOB_RECURSE SOURCES 
     "src/*.cpp"
@@ -28,5 +34,7 @@ add_executable(webServer ${SOURCES})
 
 # Link libraries (if needed, for Windows sometimes ws2_32 is needed for networking)
 if(WIN32)
-    target_link_libraries(webServer ws2_32)
+    target_link_libraries(webServer ws2_32 OpenSSL::Crypto)
+else()
+    target_link_libraries(webServer OpenSSL::Crypto dl pthread)
 endif()
