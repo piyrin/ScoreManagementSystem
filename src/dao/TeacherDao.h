@@ -51,3 +51,4 @@ private:
     //SQLite数据库连接句柄，通过SqliteUtils管理
     sqlite3 *db;//依赖SqliteUtils.h中定义的sqlite3类型
 };
+#endif

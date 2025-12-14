@@ -1,6 +1,7 @@
 #ifndef SQLITEUTILS_H
 #define SQLITEUTILS_H
 #include <string>
+#include<sqlite3.h>
 // 关联配置模块，获取相关配置
 #include "../config/Config.h"
 
@@ -19,10 +20,14 @@ private:
     SqliteUtils();
     // 私有析构函数：关闭数据库连接
     ~SqliteUtils();
+    std::string dbPath; // 数据库文件路径（bin/score_db.db）
 
     // 禁止拷贝构造和赋值
     SqliteUtils(const SqliteUtils &) = delete;
     SqliteUtils &operator=(const SqliteUtils &) = delete;
+
+    // 私有建表方法（内部调用，自动执行）
+    bool createAllTables();
 
 public:
     // 公有静态函数，获取实例指针
