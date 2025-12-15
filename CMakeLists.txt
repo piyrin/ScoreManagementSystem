@@ -6,6 +6,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Include directories
 include_directories(
+    src
     src/config
     src/core/Controller
     src/core/Model

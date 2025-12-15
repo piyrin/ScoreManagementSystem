@@ -42,13 +42,13 @@ public:
     //查询个人所有成绩（返回该学生成绩列表）
     //参数:login_user=登录用户（学生角色）
     //返回：成绩列表（空列表表示查询失败/无成绩）
-    std::vector<ScoreModel> getMyscore(const UserModel &login_user);
+    std::vector<ScoreModel> getMyScore(const UserModel &login_user);
 
 private:
     // 依赖Dao层对象（业务层不直接操作数据库）
     class StudentDao *student_dao;
     class ScoreDao *score_dao;
-    
+
 };
 
 #endif

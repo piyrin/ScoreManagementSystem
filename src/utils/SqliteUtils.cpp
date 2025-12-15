@@ -33,6 +33,8 @@ SqliteUtils::SqliteUtils()
     else
     {
         std::cout << "数据库连接成功：" << dbPath << std::endl;
+        // 自动建表
+        createAllTables();
     }
 }
 

@@ -41,7 +41,7 @@ public:
     int getStudentId() const;
     int getCourseId() const;
     double getScore() const;
-    std ::string getExamTime() const;
+    std::string getExamTime() const;
     int getTeacherId() const;
     double getGpa() const;
 
