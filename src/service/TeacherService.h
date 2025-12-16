@@ -1,0 +1,71 @@
+#ifndef TEACHER_SERVICE_H
+#define TEACHER_SERVICE_H
+
+#include <vector>
+#include <string>
+#include "../core/Model/UserModel.h"
+#include "../core/Model/TeacherModel.h"
+#include "../core/Model/CourseModel.h"
+#include "../core/Model/ScoreModel.h"
+#include "../core/Model/StudentModel.h"
+
+// 教师业务操作结果枚举
+enum class TeacherOpResult
+{
+    SUCCESS,         // 操作成功
+    ROLE_ERROR,      // 角色错误（非教师）
+    PARAM_ERROR,     // 参数错误（必填项为空/无效）
+    NOT_FOUND,       // 未找到教师/课程/成绩信息
+    NO_PERMISSION,   // 无权限（课程非本人授课）
+    DUPLICATE_SCORE, // 成绩重复（学生+课程已存在成绩）
+    SYSTEM_ERROR     // 系统错误（数据库异常）
+};
+/**
+ * 教师业务服务
+ * 核心功能：
+ * 1. 查询个人信息（仅当前登录教师）
+ * 2. 修改个人信息（仅允许修改姓名、职称、部门、邮箱）
+ * 3. 查询所教课程列表（关联course表的teacherId）
+ * 4. 录入学生成绩（仅自己授课的课程）
+ * 5. 修改学生成绩（仅自己授课的课程的成绩）
+ * 6. 查询课程成绩列表（含学生信息，便于教师查看）
+ * 7. 课程成绩统计（平均分、及格率，针对单门课程）
+ */
+class TeacherService
+{
+public:
+    TeacherService();
+    ~TeacherService();
+
+    //查询个人信息，通过用户登录的relatedId=teacher.id
+    TeacherModel getTeacherInfo(const UserModel &login_user);
+
+    //修改个人信息
+    TeacherOpResult updateTeacherInfo(const UserModel &login_user, const UserModel &new_info);
+
+    //查询所教授课程列表，关联course的teacherId
+    std::vector<CourseModel> getMyCourse(const UserModel &login_user);
+
+    //录入学生成绩
+    //参数login_user=授课教师，score=成绩信息
+    TeacherOpResult addStudentScore(const UserModel &login_user, const ScoreModel &score);
+
+    //修改学生成绩
+    TeacherOpResult updateStudentScore(const UserModel &login_user, const ScoreModel &score);
+
+    //查询学生成绩，含姓名，学号，成绩
+    //返回：pair<学生信息，学生成绩>列表
+    std::vector<std::pair<StudentModel, ScoreModel>> getCourseScores(const UserModel &login_user, int couresId);
+    
+    //课程成绩统计（平均分+及格率）
+    //返回：pair<平均分，及格率>
+    std::pair<double, double> statCourseScore(const std::vector<std::pair<StudentModel, ScoreModel>> &courseScores);
+
+private:
+    TeacherDao *teacher_dao;
+    CourseDao *course_dao;
+    StudentDao *student_dao;
+    ScoreDao *score_dao;
+};
+
+#endif

@@ -1,10 +1,8 @@
 #include <iostream>
-#include <vector>
 #include "service/AuthService.h"
 #include "service/StudentService.h"
 #include "core/Model/StudentModel.h"
 #include "core/Model/TeacherModel.h"
-#include "core/Model/ScoreModel.h"
 
 // 打印学生业务操作结果（辅助函数）
 void printStudentOpResult(StudentOpResult result)
@@ -77,7 +75,7 @@ int main()
 
     // 6. 查询个人成绩（测试数据需手动插入数据库）
     std::cout << "\n===== 查询个人成绩 =====" << std::endl;
-    std::vector<ScoreModel> my_scores = student_service.getMyscore(login_user);
+    std::vector<ScoreModel> my_scores = student_service.getMyScores(login_user);
 
     return 0;
 }
