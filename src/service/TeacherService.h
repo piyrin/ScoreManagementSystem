@@ -9,6 +9,11 @@
 #include "../core/Model/ScoreModel.h"
 #include "../core/Model/StudentModel.h"
 
+class TeacherDao;
+class CourseDao;
+class StudentDao;
+class ScoreDao;
+
 // 教师业务操作结果枚举
 enum class TeacherOpResult
 {

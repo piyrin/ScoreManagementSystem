@@ -5,10 +5,11 @@
 #include "../dao/StudentDao.h"
 #include <iostream>
 #include <iomanip>
+#include <cmath>
 
 TeacherService::TeacherService()
 {
-    //初始化Dao层对象
+    // 初始化Dao层对象
     teacher_dao = new TeacherDao();
     course_dao = new CourseDao();
     student_dao = new StudentDao();
@@ -17,7 +18,7 @@ TeacherService::TeacherService()
 
 TeacherService::~TeacherService()
 {
-    //释放Dao层资源
+    // 释放Dao层资源
     delete teacher_dao;
     delete course_dao;
     delete student_dao;
@@ -47,25 +48,25 @@ bool TeacherService::checkCoursePermission(const UserModel &login_user, int cour
 
 TeacherModel TeacherService::getTeacherInfo(const UserModel &login_user)
 {
-    //角色检验：验证是否是老师
-    if(login_user.getRole()!=UserRole::TEACHER)
+    // 角色检验：验证是否是老师
+    if (login_user.getRole() != UserRole::TEACHER)
     {
         std::cerr << "教师信息查询失败：角色错误(当前角色：" << login_user.getRoleStr() << ")" << std::endl;
         return TeacherModel();
     }
 
-    //从UserModel中获取关联的teacher.id
+    // 从UserModel中获取关联的teacher.id
     int teacher_id = login_user.getRelatedId();
-    if(teacher_id==0)
+    if (teacher_id == 0)
     {
         std::cerr << "教师信息查询失败:关联ID无效" << std::endl;
         return TeacherModel();
     }
 
-    //调用Dao层查询教师信息
+    // 调用Dao层查询教师信息
     TeacherModel teacher = teacher_dao->selectById(teacher_id);
     {
-        if(teacher.getId()==0)
+        if (teacher.getId() == 0)
         {
             std::cerr << "教师信息查询失败:未找到ID为" << teacher_id << "的教师" << std::endl;
         }
@@ -79,14 +80,14 @@ TeacherModel TeacherService::getTeacherInfo(const UserModel &login_user)
 
 TeacherOpResult TeacherService::updateTeacherInfo(const UserModel &login_user, const TeacherModel &new_info)
 {
-    if(login_user.getRole()!=UserRole::TEACHER)
+    if (login_user.getRole() != UserRole::TEACHER)
     {
         std::cerr << "修改个人信息失败：角色错误" << std::endl;
         return TeacherOpResult::ROLE_ERROR;
     }
 
-    //校验参数
-    if(new_info.getName().empty())
+    // 校验参数
+    if (new_info.getName().empty())
     {
         std::cerr << "修改个人信息失败：姓名不能为空" << std::endl;
         return TeacherOpResult::PARAM_ERROR;
@@ -221,8 +222,8 @@ TeacherOpResult TeacherService::addStudentScore(const UserModel &login_user, con
         return TeacherOpResult::SYSTEM_ERROR;
     }
 }
-se
-std::vector<std::pair<StudentModel, ScoreModel>> TeacherService ::getCourseScores(const UserModel &login_user, int couresId)
+
+std::vector<std::pair<StudentModel, ScoreModel>> TeacherService ::getCourseScores(const UserModel &login_user, int courseId)
 {
     std::vector<std::pair<StudentModel, ScoreModel>> result;
     // 校验角色
@@ -238,19 +239,19 @@ std::vector<std::pair<StudentModel, ScoreModel>> TeacherService ::getCourseScore
         return result;
     }
 
-    //查询该课所有成绩
-    std::vector<ScoreModel> scores = score_dao->selectByCourseId(couresId);
-    if(scores.empty())
+    // 查询该课所有成绩
+    std::vector<ScoreModel> scores = score_dao->selectByCourseId(courseId);
+    if (scores.empty())
     {
         std::cout << "课程成绩查询结果：暂无学生成绩" << std::endl;
         return result;
     }
 
-    //关联学生信息 成绩->学生id->学生信息
-    for(const auto&score:scores )
-    {Student
-        StudentModel student = student_dao->selectById(score.getCourseId());
-        if(student.getId()!=0)
+    // 关联学生信息 成绩->学生id->学生信息
+    for (const auto &score : scores)
+    {
+        StudentModel student = student_dao->selectById(score.getStudentId());
+        if (student.getId() != 0)
         {
             result.emplace_back(student, score);
         }
@@ -312,4 +313,54 @@ std::pair<double, double> TeacherService::statCourseScore(const std::vector<std:
     std::cout << "及格率：" << pass_rate << "%" << std::endl;
 
     return {avg_score, pass_rate};
+}
+
+// 修改学生成绩（校验课程权限+成绩存在）
+TeacherOpResult TeacherService::updateStudentScore(const UserModel &login_user, const ScoreModel &score)
+{
+    // 校验角色
+    if (login_user.getRole() != UserRole::TEACHER)
+    {
+        std::cerr << "成绩修改失败：角色错误" << std::endl;
+        return TeacherOpResult::ROLE_ERROR;
+    }
+
+    // 校验参数：成绩ID、分数、考试时间不能为空/无效
+    if (score.getId() == 0 || score.getScore() < 0 || score.getExamTime().empty())
+    {
+        std::cerr << "成绩修改失败:参数无效(成绩ID/分数/考试时间不能为空)" << std::endl;
+        return TeacherOpResult::PARAM_ERROR;
+    }
+
+    // 校验成绩是否存在
+    ScoreModel exist_score = score_dao->selectById(score.getId());
+    if (exist_score.getId() == 0)
+    {
+        std::cerr << "成绩修改失败:未找到ID为" << score.getId() << "的成绩" << std::endl;
+        return TeacherOpResult::NOT_FOUND;
+    }
+
+    // 校验课程权限（修改的成绩对应的课程是否为本人授课）
+    if (!checkCoursePermission(login_user, exist_score.getCourseId()))
+    {
+        return TeacherOpResult::NO_PERMISSION;
+    }
+
+    // 构造修改对象：仅更新分数和考试时间，其他字段（学生ID/课程ID）不可修改
+    ScoreModel update_score = exist_score;
+    update_score.setScore(score.getScore());
+    update_score.setExamTime(score.getExamTime());
+
+    // 更新
+    if (score_dao->update(update_score))
+    {
+        std::cout << "成绩修改成功:成绩ID=" << update_score.getId()
+                  << " 新分数=" << update_score.getScore() << std::endl;
+        return TeacherOpResult::SUCCESS;
+    }
+    else
+    {
+        std::cerr << "成绩修改失败：数据库更新异常" << std::endl;
+        return TeacherOpResult::SYSTEM_ERROR;
+    }
 }

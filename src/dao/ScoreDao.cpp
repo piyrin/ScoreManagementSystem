@@ -75,7 +75,7 @@ ScoreModel ScoreDao::selectById(int id)
         return ScoreModel();
 
     // SQL语句：根据id查询成绩
-    std::string sql = "SELECT id, studentId, courseId, teacherId, score, examTim FROM score WHERE id = ?;";
+    std::string sql = "SELECT id, studentId, courseId, teacherId, score, examTime FROM score WHERE id = ?;";
     sqlite3_stmt *stmt = nullptr;
     int ret = sqlite3_prepare_v2(this->db, sql.c_str(), -1, &stmt, nullptr);
     if (ret != SQLITE_OK)
@@ -240,7 +240,7 @@ bool ScoreDao::update(const ScoreModel &score)
         return false;
 
     // SQL语句：根据id更新成绩信息（可更新分数、考试时间、备注）
-    std::string sql = "UPDATE score SET score = ?, examTime = ?, WHERE id = ?;";
+    std::string sql = "UPDATE score SET score = ?, examTime = ? WHERE id = ?;";
     sqlite3_stmt *stmt = nullptr;
     int ret = sqlite3_prepare_v2(this->db, sql.c_str(), -1, &stmt, nullptr);
     if (ret != SQLITE_OK)
@@ -344,54 +344,3 @@ std::vector<ScoreModel> ScoreDao::selectByStudentIdAndCourseId(int studentId, in
     sqlite3_finalize(stmt);
     return scoreList;
 }
-
-//修改学生成绩（校验课程权限+成绩存在）
-TeacherOpResult TeacherService::updateStudentScore(const UserModel &login_user, const ScoreModel &score)
-{
-    // 校验角色
-    if (login_user.getRole() != UserRole::TEACHER)
-    {
-        std::cerr << "成绩修改失败：角色错误" << std::endl;
-        return TeacherOpResult::ROLE_ERROR;
-    }
-
-    // 校验参数：成绩ID、分数、考试时间不能为空/无效
-    if (score.getId() == 0 || score.getScore() < 0 || score.getExamTime().empty())
-    {
-        std::cerr << "成绩修改失败:参数无效(成绩ID/分数/考试时间不能为空)" << std::endl;
-        return TeacherOpResult::PARAM_ERROR;
-    }
-
-    // 校验成绩是否存在
-    ScoreModel exist_score = score_dao->selectById(score.getId());
-    if (exist_score.getId() == 0)
-    {
-        std::cerr << "成绩修改失败:未找到ID为" << score.getId() << "的成绩" << std::endl;
-        return TeacherOpResult::NOT_FOUND;
-    }
-
-    // 校验课程权限（修改的成绩对应的课程是否为本人授课）
-    if (!checkCoursePermission(login_user, exist_score.getCourseId()))
-    {
-        return TeacherOpResult::NO_PERMISSION;
-    }
-
-    // 构造修改对象：仅更新分数和考试时间，其他字段（学生ID/课程ID）不可修改
-    ScoreModel update_score = exist_score;
-    update_score.setScore(score.getScore());
-    update_score.setExamTime(score.getExamTime());
-
-    // 更新
-    if (score_dao->update(update_score))
-    {
-        std::cout << "成绩修改成功:成绩ID=" << update_score.getId()
-                  << " 新分数=" << update_score.getScore() << std::endl;
-        return TeacherOpResult::SUCCESS;
-    }
-    else
-    {
-        std::cerr << "成绩修改失败：数据库更新异常" << std::endl;
-        return TeacherOpResult::SYSTEM_ERROR;
-    }
-}
-

@@ -1,4 +1,5 @@
 #include <iostream>
+#include <windows.h>
 #include "service/AuthService.h"
 #include "service/StudentService.h"
 #include "core/Model/StudentModel.h"
@@ -29,6 +30,9 @@ void printStudentOpResult(StudentOpResult result)
 
 int main()
 {
+    // 设置控制台输出编码为 UTF-8，解决中文乱码问题
+    SetConsoleOutputCP(65001);
+
     // 1. 初始化服务
     AuthService auth_service;
     StudentService student_service;
@@ -75,7 +79,7 @@ int main()
 
     // 6. 查询个人成绩（测试数据需手动插入数据库）
     std::cout << "\n===== 查询个人成绩 =====" << std::endl;
-    std::vector<ScoreModel> my_scores = student_service.getMyScores(login_user);
+    std::vector<ScoreModel> my_scores = student_service.getMyScore(login_user);
 
     return 0;
 }
