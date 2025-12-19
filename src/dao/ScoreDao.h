@@ -54,6 +54,9 @@ public:
     // 返回：true-成功，false-失败
     bool deleteById(int id);
 
+    // 根据学生ID和课程ID查询成绩（校验重复）
+    std::vector<ScoreModel> selectByStudentIdAndCourseId(int studentId, int courseId);
+
 private:
     // SQLite数据库连接句柄（通过SqliteUtils获取）
     sqlite3 *db;

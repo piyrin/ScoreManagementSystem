@@ -41,7 +41,7 @@ public:
     TeacherModel getTeacherInfo(const UserModel &login_user);
 
     //修改个人信息
-    TeacherOpResult updateTeacherInfo(const UserModel &login_user, const UserModel &new_info);
+    TeacherOpResult updateTeacherInfo(const UserModel &login_user, const TeacherModel &new_info);
 
     //查询所教授课程列表，关联course的teacherId
     std::vector<CourseModel> getMyCourse(const UserModel &login_user);
@@ -66,6 +66,8 @@ private:
     CourseDao *course_dao;
     StudentDao *student_dao;
     ScoreDao *score_dao;
+    // 辅助方法：校验课程是否为当前教师授课（内部调用，简化代码）
+    bool checkCoursePermission(const UserModel &login_user, int courseId);
 };
 
 #endif
