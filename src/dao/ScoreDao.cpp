@@ -3,10 +3,8 @@
 #include <vector>
 #include <sqlite3.h>
 
-// 构造函数：初始化数据库连接
 ScoreDao::ScoreDao()
 {
-    // 通过SqliteUtils单例获取数据库连接
     this->db = SqliteUtils::getInstance()->getDbConnection();
     if (this->db == nullptr)
     {
@@ -18,10 +16,8 @@ ScoreDao::ScoreDao()
     }
 }
 
-// 析构函数：释放资源（无需关连接）
 ScoreDao::~ScoreDao()
 {
-    std::cout << "ScoreDao资源释放" << std::endl;
 }
 
 // 1. 新增成绩
@@ -30,10 +26,7 @@ bool ScoreDao::insert(const ScoreModel &score)
     if (this->db == nullptr)
         return false;
 
-    // SQL语句：插入成绩数据（id自增，无需传入）
-    // 对应score表字段：studentId、courseId、teacherId、score、examTime
-    std::string sql = "INSERT INTO score (studentId, courseId, teacherId, score, examTime) "
-                      "VALUES (?, ?, ?, ?, ?);";
+    std::string sql = "INSERT INTO score (studentId, courseId, teacherId, score, examTime) VALUES (?, ?, ?, ?, ?);";
 
     // 准备SQL语句
     sqlite3_stmt *stmt = nullptr;
@@ -45,14 +38,12 @@ bool ScoreDao::insert(const ScoreModel &score)
         return false;
     }
 
-    // 绑定参数（顺序与SQL字段一致）
-    sqlite3_bind_int(stmt, 1, score.getStudentId());                               // studentId（int）
-    sqlite3_bind_int(stmt, 2, score.getCourseId());                                // courseId（int）
-    sqlite3_bind_int(stmt, 3, score.getTeacherId());                               // teacherId（int）
-    sqlite3_bind_double(stmt, 4, score.getScore());                                // score（double，支持小数）
-    sqlite3_bind_text(stmt, 5, score.getExamTime().c_str(), -1, SQLITE_TRANSIENT); // examTime（字符串）
+    sqlite3_bind_int(stmt, 1, score.getStudentId());
+    sqlite3_bind_int(stmt, 2, score.getCourseId());
+    sqlite3_bind_int(stmt, 3, score.getTeacherId());
+    sqlite3_bind_double(stmt, 4, score.getScore());
+    sqlite3_bind_text(stmt, 5, score.getExamTime().c_str(), -1, SQLITE_TRANSIENT);
 
-    // 执行SQL（注意：studentId+courseId联合唯一，重复会失败）
     ret = sqlite3_step(stmt);
     sqlite3_finalize(stmt);
 
@@ -85,21 +76,19 @@ ScoreModel ScoreDao::selectById(int id)
         return ScoreModel();
     }
 
-    // 绑定id参数
     sqlite3_bind_int(stmt, 1, id);
 
-    // 执行查询并解析结果
     ScoreModel score;
     ret = sqlite3_step(stmt);
     if (ret == SQLITE_ROW)
     {
-        // 从结果集提取字段（顺序与SQL查询字段一致）
         int dbId = sqlite3_column_int(stmt, 0);
         int studentId = sqlite3_column_int(stmt, 1);
         int courseId = sqlite3_column_int(stmt, 2);
         int teacherId = sqlite3_column_int(stmt, 3);
         double scoreVal = sqlite3_column_double(stmt, 4);
-        std::string examTime = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 5));
+        const char *eTime = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 5));
+        std::string examTime = eTime ? eTime : "";
 
         // 构造ScoreModel对象（含id）
         score = ScoreModel(dbId, studentId, courseId, scoreVal, examTime, teacherId);
@@ -142,7 +131,8 @@ std::vector<ScoreModel> ScoreDao::selectByStudentId(int studentId)
         int dbCourseId = sqlite3_column_int(stmt, 2);
         int dbTeacherId = sqlite3_column_int(stmt, 3);
         double scoreVal = sqlite3_column_double(stmt, 4);
-        std::string examTime = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 5));
+        const char *eTime = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 5));
+        std::string examTime = eTime ? eTime : "";
 
         // 构造ScoreModel对象并加入列表
         ScoreModel score(dbId, dbStudentId, dbCourseId, scoreVal, examTime, dbTeacherId);
@@ -183,7 +173,8 @@ std::vector<ScoreModel> ScoreDao::selectByCourseId(int courseId)
         int dbCourseId = sqlite3_column_int(stmt, 2);
         int dbTeacherId = sqlite3_column_int(stmt, 3);
         double scoreVal = sqlite3_column_double(stmt, 4);
-        std::string examTime = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 5));
+        const char *eTime = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 5));
+        std::string examTime = eTime ? eTime : "";
 
         // 构造ScoreModel对象并加入列表
         ScoreModel score(dbId, dbStudentId, dbCourseId, scoreVal, examTime, dbTeacherId);

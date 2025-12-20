@@ -6,8 +6,8 @@
 /**
  * 学生模型：存储学生基本信息
  * 关联关系：
- * - 与成绩模型（ScoreModel）通过studentId关联（一个学生有多条成绩记录）
- * - 与用户模型（UserModel）通过relatedId关联（用户表中的学生角色关联此id）
+ * - 与成绩模型（ScoreModel）通过studentId关联
+ * - 与用户模型（UserModel）通过relatedId关联
  */
 class StudentModel
 {
@@ -32,7 +32,7 @@ public:
     StudentModel(int id, const std::string &studentNo, const std::string &name, const std::string &gender,
                  const std::string &major, const std::string &grade, const std::string &phone);
 
-    // Getter方法：获取私有成员变量
+    // Getter函数
     int getId() const;
     std::string getStudentNo() const;
     std::string getName() const;
@@ -41,7 +41,7 @@ public:
     std::string getGrade() const;
     std::string getPhone() const;
 
-    // Setter方法：修改私有成员变量
+    // Setter函数
     void setId(int id);
     void setStudentNo(const std::string &studentNo);
     void setName(const std::string &name);

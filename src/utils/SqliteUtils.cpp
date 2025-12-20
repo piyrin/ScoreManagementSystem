@@ -4,7 +4,6 @@
 #include <string>
 #include "../config/Config.h"
 
-// 静态成员变量初始化：单例指针
 SqliteUtils *SqliteUtils::instance = nullptr;
 
 SqliteUtils *SqliteUtils::getInstance()
@@ -18,13 +17,10 @@ SqliteUtils *SqliteUtils::getInstance()
 
 SqliteUtils::SqliteUtils()
 {
-    // 从config模块获取数据库路径，关联之前模块
     Config *config = Config::getInstance();
     std::string dbPath = config->getPathConfig().db_path;
 
-    // 打开SQLite数据库，若不存在会自动创建
     int ret = sqlite3_open(dbPath.c_str(), &conn);
-    // 连接失败，打印错误信息
     if (ret != SQLITE_OK)
     {
         std::cerr << "数据库连接失败：" << sqlite3_errmsg(conn) << std::endl;
@@ -42,9 +38,8 @@ SqliteUtils::~SqliteUtils()
 {
     if (conn != nullptr)
     {
-        sqlite3_close(conn); // 关闭数据库
+        sqlite3_close(conn);
         conn = nullptr;
-        std::cout << "数据库连接已关闭" << std::endl;
     }
 }
 

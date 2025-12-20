@@ -1,7 +1,6 @@
 #include "TeacherModel.h"
 #include <sstream>
 
-// 默认构造
 TeacherModel::TeacherModel() : id(0) {}
 
 // 带参构造，无Id

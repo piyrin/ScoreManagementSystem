@@ -9,7 +9,6 @@
 
 TeacherService::TeacherService()
 {
-    // 初始化Dao层对象
     teacher_dao = new TeacherDao();
     course_dao = new CourseDao();
     student_dao = new StudentDao();
@@ -18,7 +17,6 @@ TeacherService::TeacherService()
 
 TeacherService::~TeacherService()
 {
-    // 释放Dao层资源
     delete teacher_dao;
     delete course_dao;
     delete student_dao;
@@ -27,7 +25,6 @@ TeacherService::~TeacherService()
 
 bool TeacherService::checkCoursePermission(const UserModel &login_user, int courseId)
 {
-    // 校验课程是否存在
     CourseModel course = course_dao->selectById(courseId);
     if (course.getId() == 0)
     {
@@ -48,7 +45,6 @@ bool TeacherService::checkCoursePermission(const UserModel &login_user, int cour
 
 TeacherModel TeacherService::getTeacherInfo(const UserModel &login_user)
 {
-    // 角色检验：验证是否是老师
     if (login_user.getRole() != UserRole::TEACHER)
     {
         std::cerr << "教师信息查询失败：角色错误(当前角色：" << login_user.getRoleStr() << ")" << std::endl;
@@ -86,7 +82,6 @@ TeacherOpResult TeacherService::updateTeacherInfo(const UserModel &login_user, c
         return TeacherOpResult::ROLE_ERROR;
     }
 
-    // 校验参数
     if (new_info.getName().empty())
     {
         std::cerr << "修改个人信息失败：姓名不能为空" << std::endl;
@@ -132,7 +127,6 @@ TeacherOpResult TeacherService::updateTeacherInfo(const UserModel &login_user, c
 std::vector<CourseModel> TeacherService::getMyCourse(const UserModel &login_user)
 {
     vector<CourseModel> courses;
-    // 校验角色
     if (login_user.getRole() != UserRole::TEACHER)
     {
         std::cerr << "课程查询失败：角色错误" << std::endl;
@@ -156,7 +150,6 @@ std::vector<CourseModel> TeacherService::getMyCourse(const UserModel &login_user
     else
     {
         std::cout << "课程查询成功：共" << courses.size() << "门授课课程" << std::endl;
-        // 打印课程详情
         for (const auto &course : courses)
         {
             std::cout << "课程ID:" << course.getId()
@@ -171,7 +164,6 @@ std::vector<CourseModel> TeacherService::getMyCourse(const UserModel &login_user
 
 TeacherOpResult TeacherService::addStudentScore(const UserModel &login_user, const ScoreModel &score)
 {
-    // 校验角色
     if (login_user.getRole() != UserRole::TEACHER)
     {
         std::cerr << "成绩录入失败：角色错误" << std::endl;

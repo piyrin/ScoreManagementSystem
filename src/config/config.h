@@ -18,14 +18,14 @@ struct PathConfig
 class Config
 {
     private:
-        //私有成员，存储配置的结构体
+        //存储配置的结构体
         ServerConfig server_conf;
         PathConfig path_conf;
-        //静态指针（全局唯一实例）
+
         static Config *instance;
-        //私有构造函数，禁止外部创建实例
+
         Config();
-        //私有函数，加载ini配置文件
+        //加载ini配置文件
         void loadIni(const string &ini_path = "conf/server.ini");
 
     public:
@@ -33,10 +33,10 @@ class Config
         Config(const Config&) = delete;
         Config &operator=(const Config&) = delete;
 
-        //静态函数，获取单例实例
+        //获取单例实例
         static Config *getInstance();
 
-        //公有函数，获取配置（供其他模块使用）
+        //获取配置
         ServerConfig getServerConfig() const;
         PathConfig getPathConfig() const;
 };

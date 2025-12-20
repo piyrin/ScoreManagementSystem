@@ -91,11 +91,16 @@ CourseModel CourseDao::selectById(int id)
     if (ret == SQLITE_ROW)
     {
         int dbid = sqlite3_column_int(stmt, 0);
-        std::string courseNo = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 1));
-        std::string courseName = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 2));
+        const char* cNo = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 1));
+        const char* cName = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 2));
         int credit = sqlite3_column_int(stmt, 3);
         int teacherId = sqlite3_column_int(stmt, 4);
-        std::string description = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 5));
+        const char* desc = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 5));
+
+        std::string courseNo = cNo ? cNo : "";
+        std::string courseName = cName ? cName : "";
+        std::string description = desc ? desc : "";
+
         course = CourseModel(dbid, courseNo, courseName, credit, teacherId, description);
     }
     else
@@ -132,11 +137,15 @@ std::vector<CourseModel> CourseDao::selectByTeacherId(int teacherId)
     while ((ret = sqlite3_step(stmt)) == SQLITE_ROW)
     {
         int dbId = sqlite3_column_int(stmt, 0);
-        std::string courseNo = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 1));
-        std::string courseName = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 2));
+        const char* cNo = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 1));
+        const char* cName = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 2));
         int credit = sqlite3_column_int(stmt, 3);
         int dbTeacherId = sqlite3_column_int(stmt, 4);
-        std::string description = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 5));
+        const char* desc = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 5));
+
+        std::string courseNo = cNo ? cNo : "";
+        std::string courseName = cName ? cName : "";
+        std::string description = desc ? desc : "";
 
         courseList.emplace_back(dbId, courseNo, courseName, credit, dbTeacherId, description);
     }
@@ -167,11 +176,15 @@ std::vector<CourseModel> CourseDao::selectAll()
     while ((ret = sqlite3_step(stmt)) == SQLITE_ROW)
     {
         int dbId = sqlite3_column_int(stmt, 0);
-        std::string courseNo = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 1));
-        std::string courseName = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 2));
+        const char* cNo = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 1));
+        const char* cName = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 2));
         int credit = sqlite3_column_int(stmt, 3);
         int teacherId = sqlite3_column_int(stmt, 4);
-        std::string description = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 5));
+        const char* desc = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 5));
+
+        std::string courseNo = cNo ? cNo : "";
+        std::string courseName = cName ? cName : "";
+        std::string description = desc ? desc : "";
 
         courseList.emplace_back(dbId, courseNo, courseName, credit, teacherId, description);
     }

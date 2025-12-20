@@ -29,11 +29,10 @@ private:
     int teacherId;            //老师Id，关联老师表      
 
 public:
-    //默认构造函数
     ScoreModel();
-    //带参构造函数，创建新成绩，无Id
+    //创建新成绩，无Id
     ScoreModel(int studentId, int courseId, double score, std::string examTime, int teacherId);
-    //带参构造函数，创建新成绩，有Id
+    //创建新成绩，有Id
     ScoreModel(int id, int studentId, int courseId, double score, std::string examTime, int teacherId);
 
     //Getter函数

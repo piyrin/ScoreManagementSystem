@@ -24,12 +24,7 @@ enum class RegisterResult
     PARAM_ERROR,        // 参数错误（必填项为空）
     SYSTEM_ERROR        // 系统错误
 };
-/**
- * 认证业务服务（登录+注册）
- * 核心逻辑：
- * 1. 注册：先创建学生/教师身份，再创建对应的登录账号（关联ID）
- * 2. 登录：校验用户名密码，返回用户角色和关联身份ID
- */
+
 class AuthService
 {
 public:
@@ -44,14 +39,12 @@ public:
     RegisterResult adminRegister(const std::string &username, const std::string &password);
 
     //用户登录（用户名+密码）
-    // 参数：username=用户名，password=明文密码，out_user=输出登录成功的用户信息
     LoginResult login(const std::string &username, const std::string &password, UserModel &out_user);
 
     //密码重置（需验证原密码）
     bool resetPassword(const std::string &username, const std::string &old_pwd, const std::string &new_pwd);
 
 private:
-    // 依赖 Dao 层对象（业务层通过 Dao 操作数据库，不直接操作）
     class UserDao *user_dao;
     class StudentDao *student_dao;
     class TeacherDao *teacher_dao;

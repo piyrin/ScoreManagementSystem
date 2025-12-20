@@ -5,10 +5,9 @@
 #include "../core/Model/CourseModel.h"
 #include "../utils/SqliteUtils.h"
 
-/**
- * 课程数据访问对象（操作 course 表）
- * 核心功能：课程增删改查，支持按教师ID查询授课课程
- */
+
+ //功能：课程增删改查，支持按教师ID查询授课课程
+
 class CourseDao
 {
 public:

@@ -5,14 +5,12 @@
 
 StudentService::StudentService()
 {
-    //初始化Dao层对象
     student_dao = new StudentDao();
     score_dao = new ScoreDao();
 }
 
 StudentService::~StudentService()
 {
-    //释放Dao层资源
     delete student_dao;
     delete score_dao;
 }
@@ -20,14 +18,12 @@ StudentService::~StudentService()
 //查询个人信息
 StudentModel StudentService::getStudentInfo(const UserModel &login_user)
 {
-    //角色检验，必须是学生
     if(login_user.getRole()!=UserRole::STUDENT)
     {
         std::cerr << "学生信息查询失败：角色错误(当前角色：" << login_user.getRoleStr() << ")" << std::endl;
         return StudentModel();
     }
 
-    //从UserModle中获取关联的student.id
     int student_id = login_user.getRelatedId();
     if(student_id==0)
     {
@@ -35,7 +31,6 @@ StudentModel StudentService::getStudentInfo(const UserModel &login_user)
         return StudentModel();
     }
 
-    //调用Dao层查询学生信息
     StudentModel student = student_dao->selectById(student_id);
     if (student.getId() == 0)
     {
@@ -57,14 +52,12 @@ StudentOpResult StudentService::updateStudentInfo(const UserModel &login_user, c
         return StudentOpResult::ROLE_ERROR;
     }
 
-    //校验参数
     if(new_info.getName().empty())
     {
         std::cerr << "修改个人信息失败：姓名不能为空" << std::endl;
         return StudentOpResult::PARAM_ERROR;
     }
 
-    //获取当前学生Id
     int student_id = login_user.getRelatedId();
     if(student_id==0)
     {
@@ -72,20 +65,19 @@ StudentOpResult StudentService::updateStudentInfo(const UserModel &login_user, c
         return StudentOpResult::SYSTEM_ERROR;
     }
 
-    //查询原始信息，确保学生存在，保留原始性别/学号
     StudentModel old_student = student_dao->selectById(student_id);
     if(old_student.getId()==0)
     {
         std::cerr << "修改个人信息失败：未找到学生" << std::endl;
         return StudentOpResult::NOT_FOUND;
     }
+    
     StudentModel update_student = old_student;
     update_student.setName(new_info.getName());
     update_student.setMajor(new_info.getMajor());
     update_student.setGrade(new_info.getGrade());
     update_student.setPhone(new_info.getPhone());
     
-    //调用Dao层执行更新
     if(student_dao->update(update_student))
     {
         std::cout << "修改个人信息成功：" << update_student.toString() << std::endl;

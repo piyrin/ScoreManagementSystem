@@ -7,7 +7,6 @@
 
 AuthService::AuthService()
 {
-    //初始化Dao层对象
     user_dao = new UserDao();
     student_dao = new StudentDao();
     teacher_dao = new TeacherDao();
@@ -15,7 +14,6 @@ AuthService::AuthService()
 
 AuthService::~AuthService()
 {
-    // 释放 Dao 层对象
     delete user_dao;
     delete student_dao;
     delete teacher_dao;
@@ -24,7 +22,6 @@ AuthService::~AuthService()
 //学生注册，先插学生表，再插用户表，关联student.id，角色=3
 RegisterResult AuthService::studentRegister(const std::string &username, const std::string &password, const StudentModel &studentInfo)
 {
-    //参数校验，必填项非空
     if (username.empty() || password.empty() || studentInfo.getName().empty() || studentInfo.getStudentNo().empty())
     {
         std::cerr << "学生注册失败:必填项为空" << std::endl;
@@ -49,14 +46,14 @@ RegisterResult AuthService::studentRegister(const std::string &username, const s
         std::cerr << "学生注册失败：插入学生信息失败" << std::endl;
         return RegisterResult::SYSTEM_ERROR;
     }
-    //获取刚插入学生的id
+
     StudentModel new_student = student_dao->selectByStudentNo(studentInfo.getStudentNo());
     if (new_student.getId() == 0)
     {
         std::cerr << "学生注册失败:获取学生ID失败" << std::endl;
         return RegisterResult::SYSTEM_ERROR;
     }
-    //插入用户表（密码，角色=学生（3），关联id=学生id）
+
     UserModel user(0, username, MD5Utils::encrypt(password), UserRole::STUDENT, new_student.getId());
     if(user_dao->insert(user))
     {
@@ -65,7 +62,6 @@ RegisterResult AuthService::studentRegister(const std::string &username, const s
     }
     else
     {
-        // 回滚：用户表插入失败，删除已插入的学生信息
         student_dao->deleteById(new_student.getId());
         std::cerr << "学生注册失败：插入用户信息失败（已回滚学生数据）" << std::endl;
         return RegisterResult::SYSTEM_ERROR;
@@ -75,7 +71,6 @@ RegisterResult AuthService::studentRegister(const std::string &username, const s
 //教师注册：先插教师表，在插用户表，关联teacher.id，角色=2
 RegisterResult AuthService::teacherRegister(const std::string &username, const std::string &password, const TeacherModel &teacherInfo)
 {
-    //参数校验
     if (username.empty() || password.empty() || teacherInfo.getTeacherNo().empty() || teacherInfo.getName().empty())
     {
         std::cerr << "教师注册失败：必填参数为空" << std::endl;

@@ -25,17 +25,8 @@ enum class TeacherOpResult
     DUPLICATE_SCORE, // 成绩重复（学生+课程已存在成绩）
     SYSTEM_ERROR     // 系统错误（数据库异常）
 };
-/**
- * 教师业务服务
- * 核心功能：
- * 1. 查询个人信息（仅当前登录教师）
- * 2. 修改个人信息（仅允许修改姓名、职称、部门、邮箱）
- * 3. 查询所教课程列表（关联course表的teacherId）
- * 4. 录入学生成绩（仅自己授课的课程）
- * 5. 修改学生成绩（仅自己授课的课程的成绩）
- * 6. 查询课程成绩列表（含学生信息，便于教师查看）
- * 7. 课程成绩统计（平均分、及格率，针对单门课程）
- */
+
+
 class TeacherService
 {
 public:
@@ -52,18 +43,15 @@ public:
     std::vector<CourseModel> getMyCourse(const UserModel &login_user);
 
     //录入学生成绩
-    //参数login_user=授课教师，score=成绩信息
     TeacherOpResult addStudentScore(const UserModel &login_user, const ScoreModel &score);
 
     //修改学生成绩
     TeacherOpResult updateStudentScore(const UserModel &login_user, const ScoreModel &score);
 
-    //查询学生成绩，含姓名，学号，成绩
-    //返回：pair<学生信息，学生成绩>列表
+    //查询学生成绩：姓名，学号，成绩
     std::vector<std::pair<StudentModel, ScoreModel>> getCourseScores(const UserModel &login_user, int couresId);
     
     //课程成绩统计（平均分+及格率）
-    //返回：pair<平均分，及格率>
     std::pair<double, double> statCourseScore(const std::vector<std::pair<StudentModel, ScoreModel>> &courseScores);
 
 private:

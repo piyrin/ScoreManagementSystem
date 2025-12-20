@@ -2,8 +2,8 @@
 #define USERMODEL_H
 #include <string>
 
-// 用户模型：定义系统用户数据结构
-// 角色说明：1—管理员，2-教师，3-学生
+
+// 角色：1—管理员，2-教师，3-学生
 // relatedId：关联学生Id或教师Id
 
 enum class UserRole
@@ -22,11 +22,10 @@ private:
     UserRole role;        // 角色：1—管理员，2-教师，3-学生
     int relatedId;        // 关联ID，学生或老师
 public:
-    // 默认构造
     UserModel();
-    // 带参构造(创建用户，无id)
+    // 创建用户，无id
     UserModel(const std::string &username, const std::string &password, UserRole role, int relatedId);
-    // 带参构造（从数据库加载用户，有id）
+    //从数据库加载用户，有id
     UserModel(int id, const std::string &username, const std::string &password, UserRole role, int relatedId);
 
     // Getter函数

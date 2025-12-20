@@ -2,7 +2,6 @@
 #include <iostream>
 #include <sqlite3.h>
 
-// 构造函数：获取数据库连接
 UserDao::UserDao()
 {
     this->db = SqliteUtils::getInstance()->getDbConnection();
@@ -16,21 +15,17 @@ UserDao::UserDao()
     }
 }
 
-// 析构函数：释放资源
 UserDao::~UserDao()
 {
-    std::cout << "UserDao资源释放" << std::endl;
 }
 
-// 1. 新增用户（注册）
+// 注册
 bool UserDao::insert(const UserModel &user)
 {
     if (this->db == nullptr)
         return false;
 
-    // SQL：插入user表（id自增）
-    std::string sql = "INSERT INTO user (username, password, role, relatedId) "
-                      "VALUES (?, ?, ?, ?);";
+    std::string sql = "INSERT INTO user (username, password, role, relatedId) VALUES (?, ?, ?, ?);";
 
     sqlite3_stmt *stmt = nullptr;
     int ret = sqlite3_prepare_v2(this->db, sql.c_str(), -1, &stmt, nullptr);
@@ -41,10 +36,10 @@ bool UserDao::insert(const UserModel &user)
         return false;
     }
 
-    // 绑定参数（对应user表字段）
+    // 绑定参数
     sqlite3_bind_text(stmt, 1, user.getUsername().c_str(), -1, SQLITE_TRANSIENT);
     sqlite3_bind_text(stmt, 2, user.getPassword().c_str(), -1, SQLITE_TRANSIENT);
-    sqlite3_bind_int(stmt, 3, static_cast<int>(user.getRole())); // 角色转int
+    sqlite3_bind_int(stmt, 3, static_cast<int>(user.getRole()));
     sqlite3_bind_int(stmt, 4, user.getRelatedId());
 
     // 执行SQL（用户名唯一，重复会失败）
@@ -89,8 +84,11 @@ UserModel UserDao::selectByUsername(const std::string &username)
     if (ret == SQLITE_ROW)
     {
         int id = sqlite3_column_int(stmt, 0);
-        std::string dbUsername = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 1));
-        std::string dbPassword = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 2));
+        const char* uname = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 1));
+        const char* pwd = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 2));
+        
+        std::string dbUsername = uname ? uname : "";
+        std::string dbPassword = pwd ? pwd : "";
         UserRole role = static_cast<UserRole>(sqlite3_column_int(stmt, 3));
         int relatedId = sqlite3_column_int(stmt, 4);
 
@@ -127,8 +125,11 @@ UserModel UserDao::selectById(int id)
     ret = sqlite3_step(stmt);
     if (ret == SQLITE_ROW)
     {
-        std::string dbUsername = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 1));
-        std::string dbPassword = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 2));
+        const char* uname = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 1));
+        const char* pwd = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 2));
+        
+        std::string dbUsername = uname ? uname : "";
+        std::string dbPassword = pwd ? pwd : "";
         UserRole role = static_cast<UserRole>(sqlite3_column_int(stmt, 3));
         int relatedId = sqlite3_column_int(stmt, 4);
         user = UserModel(id, dbUsername, dbPassword, role, relatedId);

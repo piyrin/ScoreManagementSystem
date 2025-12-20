@@ -17,7 +17,7 @@ private:
     std::string email;      // 教师邮箱
 
 public:
-    // 默认构造
+
     TeacherModel();
     // 带参构造，无Id，创建教师
     TeacherModel(const std::string &teacherNo,const std::string &name,const std::string &gender,const std::string &title,const std::string &department,const std::string &email);

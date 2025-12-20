@@ -89,12 +89,19 @@ TeacherModel TeacherDao::selectById(int id)
     {
         // 从结果集提取字段，构造TeacherModel对象
         int dbId = sqlite3_column_int(stmt, 0);
-        std::string teacherNo = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 1));
-        std::string name = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 2));
-        std::string gender = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 3));
-        std::string title = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 4));
-        std::string department = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 5));
-        std::string email = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 6));
+        const char* tNo = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 1));
+        const char* tName = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 2));
+        const char* tGender = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 3));
+        const char* tTitle = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 4));
+        const char* tDept = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 5));
+        const char* tEmail = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 6));
+
+        std::string teacherNo = tNo ? tNo : "";
+        std::string name = tName ? tName : "";
+        std::string gender = tGender ? tGender : "";
+        std::string title = tTitle ? tTitle : "";
+        std::string department = tDept ? tDept : "";
+        std::string email = tEmail ? tEmail : "";
 
         teacher = TeacherModel(dbId, teacherNo, name, gender, title, department, email);
     }
@@ -132,12 +139,19 @@ TeacherModel TeacherDao ::selectByTeacherNo(const std::string&teacherNo)
     if (ret == SQLITE_ROW)
     {
         int dbId = sqlite3_column_int(stmt, 0);
-        std::string dbTeacherNo = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 1));
-        std::string name = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 2));
-        std::string gender = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 3));
-        std::string title = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 4));
-        std::string department = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 5));
-        std::string email = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 6));
+        const char* tNo = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 1));
+        const char* tName = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 2));
+        const char* tGender = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 3));
+        const char* tTitle = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 4));
+        const char* tDept = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 5));
+        const char* tEmail = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 6));
+
+        std::string dbTeacherNo = tNo ? tNo : "";
+        std::string name = tName ? tName : "";
+        std::string gender = tGender ? tGender : "";
+        std::string title = tTitle ? tTitle : "";
+        std::string department = tDept ? tDept : "";
+        std::string email = tEmail ? tEmail : "";
 
         teacher = TeacherModel(dbId, dbTeacherNo, name, gender, title, department, email);
     }
@@ -165,12 +179,20 @@ std::vector<TeacherModel>TeacherDao::selectAll()
     {
         std::cerr << "TeacherDao查询失败:SQL准备错误 - " << sqlite3_errmsg(this->db) << std::endl;
         sqlite3_finalize(stmt);
-        return teacherList;
-    }
+        const char* tNo = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 1));
+        const char* tName = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 2));
+        const char* tGender = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 3));
+        const char* tTitle = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 4));
+        const char* tDept = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 5));
+        const char* tEmail = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 6));
 
-    //循环解析结果
-    while((ret=sqlite3_step(stmt))==SQLITE_ROW)
-    {
+        std::string teacherNo = tNo ? tNo : "";
+        std::string name = tName ? tName : "";
+        std::string gender = tGender ? tGender : "";
+        std::string title = tTitle ? tTitle : "";
+        std::string department = tDept ? tDept : "";
+        std::string email = tEmail ? tEmail : "";
+
         int dbId = sqlite3_column_int(stmt, 0);
         std::string teacherNo = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 1));
         std::string name = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 2));

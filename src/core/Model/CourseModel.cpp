@@ -7,7 +7,6 @@ CourseModel::CourseModel(const std::string &courseNo, const std::string &courseN
 
 CourseModel::CourseModel(int id, const std::string &courseNo, const std::string &courseName, int credit, int teacherId, const std::string &description) : id(id), courseNo(courseNo), courseName(courseName), credit(credit), teacherId(teacherId), description(description) {}
 
-// Getter函数实现
 int CourseModel::getId() const
 {
     return id;
@@ -33,7 +32,6 @@ std::string CourseModel::getDescription() const
     return description;
 }
 
-//Setter函数实现
 void CourseModel::setId(int id)
 {
     this->id = id;
@@ -66,7 +64,7 @@ std::string CourseModel::toString() const
     ss << "CourseModel{id=" << id
        << ", courseNo='" << courseNo
        << "', courseName='" << courseName
-       << "', credit=" << credit // 突出显示学分（用于绩点计算）
+       << "', credit=" << credit
        << ", teacherId=" << teacherId
        << ", description='" << description
        << "'}";
