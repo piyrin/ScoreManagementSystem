@@ -20,7 +20,6 @@ TeacherDao::TeacherDao()
 //析构函数无需手动关闭由SqliteUtils统一管理
 TeacherDao::~TeacherDao()
 {
-    std::cout << "TeacherDao资源释放" << std::endl;
 }
 
 bool TeacherDao::insert(const TeacherModel&teacher)
@@ -165,7 +164,7 @@ TeacherModel TeacherDao ::selectByTeacherNo(const std::string&teacherNo)
 }
 
 //查询所有教师
-std::vector<TeacherModel>TeacherDao::selectAll()
+std::vector<TeacherModel> TeacherDao::selectAll()
 {
     std::vector<TeacherModel> teacherList;
     if(this->db==nullptr)
@@ -179,6 +178,12 @@ std::vector<TeacherModel>TeacherDao::selectAll()
     {
         std::cerr << "TeacherDao查询失败:SQL准备错误 - " << sqlite3_errmsg(this->db) << std::endl;
         sqlite3_finalize(stmt);
+        return teacherList;
+    }
+
+    while (sqlite3_step(stmt) == SQLITE_ROW)
+    {
+        int dbId = sqlite3_column_int(stmt, 0);
         const char* tNo = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 1));
         const char* tName = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 2));
         const char* tGender = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 3));
@@ -193,15 +198,9 @@ std::vector<TeacherModel>TeacherDao::selectAll()
         std::string department = tDept ? tDept : "";
         std::string email = tEmail ? tEmail : "";
 
-        int dbId = sqlite3_column_int(stmt, 0);
-        std::string teacherNo = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 1));
-        std::string name = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 2));
-        std::string gender = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 3));
-        std::string title = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 4));
-        std::string department = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 5));
-        std::string email = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 6));
         teacherList.emplace_back(dbId, teacherNo, name, gender, title, department, email);
     }
+
     sqlite3_finalize(stmt);
     std::cout << "TeacherDao查询成功:共找到" << teacherList.size() << "名教师" << std::endl;
     return teacherList;

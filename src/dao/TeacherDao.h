@@ -38,4 +38,5 @@ public:
 private:
     //SQLite数据库连接句柄，通过SqliteUtils管理
     sqlite3 *db;
+};
 #endif
