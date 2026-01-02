@@ -28,7 +28,6 @@
 - **数据库**: SQLite3 (嵌入式)
 - **网络框架**: 自研轻量级 HTTP Server (基于 Winsock2)
 - **前端技术**: HTML5, CSS3, JavaScript (原生)
-- **加密算法**: MD5 (用户密码加密)
 
 ## 🚀 快速开始
 
