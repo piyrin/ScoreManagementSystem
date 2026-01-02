@@ -7,7 +7,6 @@
 
 
  //功能：课程增删改查，支持按教师ID查询授课课程
-
 class CourseDao
 {
 public:
@@ -15,10 +14,9 @@ public:
     ~CourseDao();
 
     //新增课程（管理员或教师添加）
-    //返回：成功-true,失败-false
     bool insert(const CourseModel &course);
 
-    //根据ID查课程
+    //查询课程
     CourseModel selectById(int id);
 
     //根据教师id查课程,教师查教的课
@@ -32,6 +30,9 @@ public:
 
     //根据id删除课程
     bool deleteById(int id);
+
+    //通过课程号查询课程
+    CourseModel selectByCourseNo(const std::string &courseNo);
 
 private:
     sqlite3 *db;

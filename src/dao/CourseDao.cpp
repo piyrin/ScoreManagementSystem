@@ -29,7 +29,7 @@ bool CourseDao::insert(const CourseModel &course)
     if (this->db == nullptr)
         return false;
 
-    // SQL语句：插入成绩数据（id自增，无需传入）
+    //插入成绩数据（id自增，无需传入）
     std::string sql = "INSERT INTO course(courseNo,courseName,credit,teacherId,description)"
                       "VALUES(?,?,?,?,?)";
 
@@ -43,7 +43,7 @@ bool CourseDao::insert(const CourseModel &course)
         return false;
     }
 
-    // 绑定参数（顺序与SQL字段一致）
+    // 绑定参数
     sqlite3_bind_text(stmt, 1, course.getCourseNo().c_str(), -1, SQLITE_TRANSIENT);
     sqlite3_bind_text(stmt, 2, course.getCourseName().c_str(), -1, SQLITE_TRANSIENT);
     sqlite3_bind_int(stmt, 3, course.getCredit());
@@ -66,12 +66,12 @@ bool CourseDao::insert(const CourseModel &course)
     }
 }
 
-// 根据id查课程
+//根据id查课程
 CourseModel CourseDao::selectById(int id)
 {
     if (this->db == nullptr)
         return CourseModel();
-    // SQL语句：根据id查课程
+    //根据id查课程
     std::string sql = "SELECT id, courseNo, courseName, credit, teacherId, description FROM course WHERE id=?;";
     sqlite3_stmt *stmt = nullptr;
     int ret = sqlite3_prepare_v2(this->db, sql.c_str(), -1, &stmt, nullptr);
@@ -119,7 +119,7 @@ std::vector<CourseModel> CourseDao::selectByTeacherId(int teacherId)
         return courseList;
     }
 
-    // SQL语句：根据teacherId查询教授课程
+    //根据teacherId查询教授课程
     std::string sql = "SELECT id, courseNo, courseName, credit, teacherId, description FROM course WHERE teacherId = ?;";
     sqlite3_stmt *stmt = nullptr;
     int ret = sqlite3_prepare_v2(this->db, sql.c_str(), -1, &stmt, nullptr);
@@ -155,7 +155,7 @@ std::vector<CourseModel> CourseDao::selectByTeacherId(int teacherId)
     return courseList;
 }
 
-// 4. 查询所有课程
+//查询所有课程
 std::vector<CourseModel> CourseDao::selectAll()
 {
     std::vector<CourseModel> courseList;
@@ -194,7 +194,7 @@ std::vector<CourseModel> CourseDao::selectAll()
     return courseList;
 }
 
-// 5. 更新课程信息
+//更新课程信息
 bool CourseDao::update(const CourseModel &course)
 {
     if (this->db == nullptr || course.getId() == 0)
@@ -207,7 +207,7 @@ bool CourseDao::update(const CourseModel &course)
         return false;
     }
 
-    // SQL语句：更新课程信息（课程号不可修改，避免冲突）
+    //更新课程信息（课程号不可修改，避免冲突）
     std::string sql = "UPDATE course SET courseName = ?, credit = ?, teacherId = ?, description = ? WHERE id = ?;";
     sqlite3_stmt *stmt = nullptr;
     int ret = sqlite3_prepare_v2(this->db, sql.c_str(), -1, &stmt, nullptr);
@@ -218,7 +218,7 @@ bool CourseDao::update(const CourseModel &course)
         return false;
     }
 
-    // 绑定参数（课程号不允许修改，仅更新其他字段）
+    // 绑定参数
     sqlite3_bind_text(stmt, 1, course.getCourseName().c_str(), -1, SQLITE_TRANSIENT);  // 课程名
     sqlite3_bind_int(stmt, 2, course.getCredit());                                     // 学分
     sqlite3_bind_int(stmt, 3, course.getTeacherId());                                  // 教师ID
@@ -241,7 +241,7 @@ bool CourseDao::update(const CourseModel &course)
     }
 }
 
-// 6. 根据ID删除课程
+//根据ID删除课程
 bool CourseDao::deleteById(int id)
 {
     if (this->db == nullptr || id == 0)
@@ -274,4 +274,38 @@ bool CourseDao::deleteById(int id)
         std::cerr << "CourseDao删除失败:执行错误 - " << sqlite3_errmsg(this->db) << std::endl;
         return false;
     }
+}
+
+CourseModel CourseDao::selectByCourseNo(const std::string &courseNo)
+{
+    if (this->db == nullptr || courseNo.empty())
+        return CourseModel();
+
+    std::string sql = "SELECT id, courseNo, courseName, credit, teacherId, description FROM course WHERE courseNo = ?;";
+    sqlite3_stmt *stmt = nullptr;
+    int ret = sqlite3_prepare_v2(this->db, sql.c_str(), -1, &stmt, nullptr);
+    if (ret != SQLITE_OK)
+    {
+        std::cerr << "CourseDao查询课程失败:SQL准备错误 - " << sqlite3_errmsg(this->db) << std::endl;
+        sqlite3_finalize(stmt);
+        return CourseModel();
+    }
+
+    sqlite3_bind_text(stmt, 1, courseNo.c_str(), -1, SQLITE_TRANSIENT);
+    CourseModel course;
+    ret = sqlite3_step(stmt);
+    if (ret == SQLITE_ROW)
+    {
+        int id = sqlite3_column_int(stmt, 0);
+        std::string dbCourseNo = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 1));
+        std::string courseName = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 2));
+        int credit = sqlite3_column_int(stmt, 3);
+        int teacherId = sqlite3_column_int(stmt, 4);
+        std::string description = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 5));
+
+        course = CourseModel(id, dbCourseNo, courseName, credit, teacherId, description);
+    }
+
+    sqlite3_finalize(stmt);
+    return course;
 }

@@ -1,31 +1,35 @@
-#include"StudentService.h"
+#include "StudentService.h"
 #include "../dao/StudentDao.h"
 #include "../dao/ScoreDao.h"
-#include<iostream>
+#include "../dao/CourseDao.h"
+#include <iostream>
+#include <cmath>
 
 StudentService::StudentService()
 {
     student_dao = new StudentDao();
     score_dao = new ScoreDao();
+    course_dao = new CourseDao();
 }
 
 StudentService::~StudentService()
 {
     delete student_dao;
     delete score_dao;
+    delete course_dao;
 }
 
-//查询个人信息
+// 查询个人信息
 StudentModel StudentService::getStudentInfo(const UserModel &login_user)
 {
-    if(login_user.getRole()!=UserRole::STUDENT)
+    if (login_user.getRole() != UserRole::STUDENT)
     {
         std::cerr << "学生信息查询失败：角色错误(当前角色：" << login_user.getRoleStr() << ")" << std::endl;
         return StudentModel();
     }
 
     int student_id = login_user.getRelatedId();
-    if(student_id==0)
+    if (student_id == 0)
     {
         std::cerr << "学生信息查询失败:关联ID无效" << std::endl;
         return StudentModel();
@@ -44,56 +48,10 @@ StudentModel StudentService::getStudentInfo(const UserModel &login_user)
     return student;
 }
 
-StudentOpResult StudentService::updateStudentInfo(const UserModel &login_user, const StudentModel &new_info)
-{
-    if(login_user.getRole()!=UserRole::STUDENT)
-    {
-        std::cerr << "修改个人信息失败：角色错误" << std::endl;
-        return StudentOpResult::ROLE_ERROR;
-    }
-
-    if(new_info.getName().empty())
-    {
-        std::cerr << "修改个人信息失败：姓名不能为空" << std::endl;
-        return StudentOpResult::PARAM_ERROR;
-    }
-
-    int student_id = login_user.getRelatedId();
-    if(student_id==0)
-    {
-        std::cerr << "修改个人信息失败:关联ID无效" << std::endl;
-        return StudentOpResult::SYSTEM_ERROR;
-    }
-
-    StudentModel old_student = student_dao->selectById(student_id);
-    if(old_student.getId()==0)
-    {
-        std::cerr << "修改个人信息失败：未找到学生" << std::endl;
-        return StudentOpResult::NOT_FOUND;
-    }
-    
-    StudentModel update_student = old_student;
-    update_student.setName(new_info.getName());
-    update_student.setMajor(new_info.getMajor());
-    update_student.setGrade(new_info.getGrade());
-    update_student.setPhone(new_info.getPhone());
-    
-    if(student_dao->update(update_student))
-    {
-        std::cout << "修改个人信息成功：" << update_student.toString() << std::endl;
-        return StudentOpResult::SUCCESS;
-    }
-    else
-    {
-        std::cerr << "修改个人信息失败：数据库更新异常" << std::endl;
-        return StudentOpResult::SYSTEM_ERROR;
-    }
-}
-
-//查询个人成绩
+// 查询个人成绩
 std::vector<ScoreModel> StudentService::getMyScore(const UserModel &login_user)
 {
-    if(login_user.getRole()!=UserRole::STUDENT)
+    if (login_user.getRole() != UserRole::STUDENT)
     {
         std::cerr << "成绩查询失败：角色错误" << std::endl;
         return std::vector<ScoreModel>();
@@ -107,7 +65,7 @@ std::vector<ScoreModel> StudentService::getMyScore(const UserModel &login_user)
     }
 
     std::vector<ScoreModel> scores = score_dao->selectByStudentId(student_id);
-    if(scores.empty())
+    if (scores.empty())
     {
         std::cout << "成绩查询结果：暂无成绩记录" << std::endl;
     }
@@ -116,12 +74,56 @@ std::vector<ScoreModel> StudentService::getMyScore(const UserModel &login_user)
         std::cout << "成绩查询成功：共" << scores.size() << "门课程成绩" << std::endl;
     }
 
-    //打印成绩
-    for(const auto&score:scores)
+    // 打印成绩
+    for (const auto &score : scores)
     {
         std::cout << "课程ID:" << score.getCourseId()
-                  << "| 考试分数:" << score.getScore()
-                  << "| 考试时间:" << score.getExamTime();
+                  << "| 考试分数:" << score.getScore();
     }
     return scores;
+}
+
+double StudentService::calculateGPA(const UserModel &login_user)
+{
+    if (login_user.getRole() != UserRole::STUDENT)
+    {
+        return 0.0;
+    }
+
+    int student_id = login_user.getRelatedId();
+    if (student_id == 0)
+    {
+        return 0.0;
+    }
+
+    std::vector<ScoreModel> scores = score_dao->selectByStudentId(student_id);
+    if (scores.empty())
+    {
+        return 0.0;
+    }
+
+    double total_weighted_gpa = 0.0;
+    double total_credits = 0.0;
+
+    for (const auto &score : scores)
+    {
+        CourseModel course = course_dao->selectById(score.getCourseId());
+        if (course.getId() != 0)
+        { // 确保课程存在
+            double gpa = score.getGpa();
+            double credit = course.getCredit();
+
+            total_weighted_gpa += gpa * credit;
+            total_credits += credit;
+        }
+    }
+
+    if (total_credits == 0.0)
+    {
+        return 0.0;
+    }
+
+    // 保留两位小数
+    double gpa = total_weighted_gpa / total_credits;
+    return std::round(gpa * 100.0) / 100.0;
 }

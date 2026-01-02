@@ -58,13 +58,13 @@ bool UserDao::insert(const UserModel &user)
     }
 }
 
-// 2. 根据用户名查询用户（登录用）
+//根据用户名查询用户（登录用）
 UserModel UserDao::selectByUsername(const std::string &username)
 {
     if (this->db == nullptr)
         return UserModel();
 
-    // SQL：根据用户名查询
+    //根据用户名查询
     std::string sql = "SELECT id, username, password, role, relatedId FROM user WHERE username = ?;";
     sqlite3_stmt *stmt = nullptr;
     int ret = sqlite3_prepare_v2(this->db, sql.c_str(), -1, &stmt, nullptr);
@@ -84,9 +84,9 @@ UserModel UserDao::selectByUsername(const std::string &username)
     if (ret == SQLITE_ROW)
     {
         int id = sqlite3_column_int(stmt, 0);
-        const char* uname = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 1));
-        const char* pwd = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 2));
-        
+        const char *uname = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 1));
+        const char *pwd = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 2));
+
         std::string dbUsername = uname ? uname : "";
         std::string dbPassword = pwd ? pwd : "";
         UserRole role = static_cast<UserRole>(sqlite3_column_int(stmt, 3));
@@ -104,7 +104,7 @@ UserModel UserDao::selectByUsername(const std::string &username)
     return user;
 }
 
-// 3. 根据ID查询用户
+//根据ID查询用户
 UserModel UserDao::selectById(int id)
 {
     if (this->db == nullptr)
@@ -125,9 +125,9 @@ UserModel UserDao::selectById(int id)
     ret = sqlite3_step(stmt);
     if (ret == SQLITE_ROW)
     {
-        const char* uname = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 1));
-        const char* pwd = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 2));
-        
+        const char *uname = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 1));
+        const char *pwd = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 2));
+
         std::string dbUsername = uname ? uname : "";
         std::string dbPassword = pwd ? pwd : "";
         UserRole role = static_cast<UserRole>(sqlite3_column_int(stmt, 3));
@@ -139,7 +139,7 @@ UserModel UserDao::selectById(int id)
     return user;
 }
 
-// 4. 更新用户密码
+//更新用户密码
 bool UserDao::updatePassword(int id, const std::string &newPassword)
 {
     if (this->db == nullptr)
@@ -173,7 +173,42 @@ bool UserDao::updatePassword(int id, const std::string &newPassword)
     }
 }
 
-// 5. 根据ID删除用户
+// 更新用户信息
+bool UserDao::update(const UserModel &user)
+{
+    if (this->db == nullptr)
+        return false;
+
+    std::string sql = "UPDATE user SET username = ?, password = ? WHERE id = ?;";
+
+    sqlite3_stmt *stmt = nullptr;
+    int ret = sqlite3_prepare_v2(this->db, sql.c_str(), -1, &stmt, nullptr);
+    if (ret != SQLITE_OK)
+    {
+        std::cerr << "UserDao更新失败:SQL准备错误 - " << sqlite3_errmsg(this->db) << std::endl;
+        sqlite3_finalize(stmt);
+        return false;
+    }
+
+    sqlite3_bind_text(stmt, 1, user.getUsername().c_str(), -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(stmt, 2, user.getPassword().c_str(), -1, SQLITE_TRANSIENT);
+    sqlite3_bind_int(stmt, 3, user.getId());
+
+    ret = sqlite3_step(stmt);
+    sqlite3_finalize(stmt);
+
+    if (ret == SQLITE_DONE)
+    {
+        return true;
+    }
+    else
+    {
+        std::cerr << "UserDao更新失败:执行错误 - " << sqlite3_errmsg(this->db) << std::endl;
+        return false;
+    }
+}
+
+//根据ID删除用户
 bool UserDao::deleteById(int id)
 {
     if (this->db == nullptr)
@@ -203,4 +238,35 @@ bool UserDao::deleteById(int id)
         std::cerr << "UserDao删除失败:用户ID不存在 - " << id << std::endl;
         return false;
     }
+}
+
+std::vector<UserModel> UserDao::selectAll()
+{
+    std::vector<UserModel> userList;
+    if (this->db == nullptr)
+        return userList;
+
+    std::string sql = "SELECT id, username, password, role, relatedId FROM user;";
+    sqlite3_stmt *stmt = nullptr;
+    int ret = sqlite3_prepare_v2(this->db, sql.c_str(), -1, &stmt, nullptr);
+    if (ret != SQLITE_OK)
+    {
+        std::cerr << "UserDao查询所有用户失败:SQL准备错误 - " << sqlite3_errmsg(this->db) << std::endl;
+        sqlite3_finalize(stmt);
+        return userList;
+    }
+
+    while ((ret = sqlite3_step(stmt)) == SQLITE_ROW)
+    {
+        int id = sqlite3_column_int(stmt, 0);
+        std::string username = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 1));
+        std::string password = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 2));
+        UserRole role = static_cast<UserRole>(sqlite3_column_int(stmt, 3));
+        int relatedId = sqlite3_column_int(stmt, 4);
+
+        userList.emplace_back(id, username, password, role, relatedId);
+    }
+
+    sqlite3_finalize(stmt);
+    return userList;
 }

@@ -31,6 +31,8 @@ SqliteUtils::SqliteUtils()
         std::cout << "数据库连接成功：" << dbPath << std::endl;
         // 自动建表
         createAllTables();
+        // 检查并创建默认管理员
+        checkAndCreateDefaultAdmin();
     }
 }
 
@@ -96,7 +98,7 @@ bool SqliteUtils::createAllTables()
         return false;
     }
 
-    // 1. 建user表（用户登录表，无外键）
+    // 1. 建user表（用户登录表）
     std::string createUserTable = R"(
         CREATE TABLE IF NOT EXISTS user (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -109,7 +111,7 @@ bool SqliteUtils::createAllTables()
         );
     )";
 
-    // 2. 建student表（学生信息表，无外键）
+    // 2. 建student表（学生信息表）
     std::string createStudentTable = R"(
         CREATE TABLE IF NOT EXISTS student (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -122,7 +124,7 @@ bool SqliteUtils::createAllTables()
         );
     )";
 
-    // 3. 建teacher表（教师信息表，无外键）
+    // 3. 建teacher表（教师信息表）
     std::string createTeacherTable = R"(
         CREATE TABLE IF NOT EXISTS teacher (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -156,7 +158,6 @@ bool SqliteUtils::createAllTables()
             courseId INTEGER NOT NULL,       -- 关联课程id(course表)
             teacherId INTEGER NOT NULL,      -- 关联授课教师id(teacher表)
             score REAL NOT NULL,             -- 分数(支持小数,如85.5)
-            examTime TEXT NOT NULL,          -- 考试时间(格式YYYY-MM-DD,对应ScoreModel)
             -- 外键约束:删除关联数据时,成绩记录保留(可根据需求调整为ON DELETE CASCADE)
             FOREIGN KEY (studentId) REFERENCES student(id) ON DELETE RESTRICT,
             FOREIGN KEY (courseId) REFERENCES course(id) ON DELETE RESTRICT,
@@ -175,4 +176,37 @@ bool SqliteUtils::createAllTables()
     ret &= executeUpdate(createScoreTable);   // 最后建score表（依赖前三者）
 
     return ret;
+}
+
+void SqliteUtils::checkAndCreateDefaultAdmin()
+{
+    if (conn == nullptr)
+        return;
+
+    // 检查是否存在管理员
+    std::string sql = "SELECT count(*) FROM user WHERE role = 1;";
+    sqlite3_stmt *stmt = nullptr;
+    if (sqlite3_prepare_v2(conn, sql.c_str(), -1, &stmt, nullptr) == SQLITE_OK)
+    {
+        if (sqlite3_step(stmt) == SQLITE_ROW)
+        {
+            int count = sqlite3_column_int(stmt, 0);
+            if (count == 0)
+            {
+                // 创建默认管理员: admin / 123456
+                // 123456 的 MD5 是 e10adc3949ba59abbe56e057f20f883e
+                std::string insertSql = "INSERT INTO user (username, password, role, relatedId) VALUES ('admin', '123456', 1, 1);";
+                executeUpdate(insertSql);
+                std::cout << "Default admin created: admin / 123456" << std::endl;
+            }
+            else
+            {
+                // 强制更新admin密码为 123456
+                std::string updateSql = "UPDATE user SET password = '123456' WHERE username = 'admin';";
+                executeUpdate(updateSql);
+                std::cout << "Admin password reset to: 123456" << std::endl;
+            }
+        }
+        sqlite3_finalize(stmt);
+    }
 }

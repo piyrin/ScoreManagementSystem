@@ -4,6 +4,13 @@ setlocal
 
 set "BIN_DIR=bin"
 set "EXE_NAME=score_system.exe"
+set "ROOT_EXE=webServer.exe"
+
+if exist "%ROOT_EXE%" (
+    echo [INFO] Found %ROOT_EXE% in root directory. Starting...
+    "%ROOT_EXE%"
+    goto :eof
+)
 
 if not exist "%BIN_DIR%\%EXE_NAME%" (
     echo [错误] 未找到可执行文件: %BIN_DIR%\%EXE_NAME%

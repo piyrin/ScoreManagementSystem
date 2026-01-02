@@ -15,28 +15,11 @@ enum class LoginResult
     SYSTEM_ERROR    // 系统错误（数据库异常）
 };
 
-// 注册结果枚举 
-enum class RegisterResult 
-{
-    SUCCESS,            // 注册成功
-    USERNAME_DUPLICATE, // 用户名已存在
-    IDENTITY_DUPLICATE, // 学号/工号已存在
-    PARAM_ERROR,        // 参数错误（必填项为空）
-    SYSTEM_ERROR        // 系统错误
-};
-
 class AuthService
 {
 public:
     AuthService();
     ~AuthService();
-
-    //学生注册(用户名+密码+学生信息)
-    RegisterResult studentRegister(const std::string &username, const std::string &password, const StudentModel &studentInfo);
-    //教师注册(用户名+密码+教师信息)
-    RegisterResult teacherRegister(const std::string &username, const std::string &password, const TeacherModel &teacherInfo);
-    //管理员注册（仅用于初始化，后续可关闭该接口）
-    RegisterResult adminRegister(const std::string &username, const std::string &password);
 
     //用户登录（用户名+密码）
     LoginResult login(const std::string &username, const std::string &password, UserModel &out_user);

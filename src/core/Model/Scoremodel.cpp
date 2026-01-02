@@ -3,9 +3,9 @@
 
 ScoreModel::ScoreModel() : id(0), studentId(0), courseId(0), score(0.0), teacherId(0) {}
 
-ScoreModel::ScoreModel(int studentId, int courseId, double score, std::string examTime, int teacherId) : id(0), studentId(studentId), courseId(courseId), score(score), examTime(examTime), teacherId(teacherId) {}
+ScoreModel::ScoreModel(int studentId, int courseId, double score, int teacherId) : id(0), studentId(studentId), courseId(courseId), score(score), teacherId(teacherId) {}
 
-ScoreModel::ScoreModel(int id, int studentId, int courseId, double score, std::string examTime, int teacherId) : id(id), studentId(studentId), courseId(courseId), score(score), examTime(examTime), teacherId(teacherId) {}
+ScoreModel::ScoreModel(int id, int studentId, int courseId, double score, int teacherId) : id(id), studentId(studentId), courseId(courseId), score(score), teacherId(teacherId) {}
 
 int ScoreModel::getId() const
 {
@@ -22,10 +22,6 @@ int ScoreModel::getCourseId() const
 double ScoreModel::getScore() const
 {
     return score;
-}
-std::string ScoreModel::getExamTime() const
-{
-    return examTime;
 }
 int ScoreModel::getTeacherId() const
 {
@@ -71,10 +67,6 @@ void ScoreModel::setScore(double score)
 {
     this->score = score;
 }
-void ScoreModel::setExamTime(const std::string &examTime)
-{
-    this->examTime = examTime;
-}
 void ScoreModel::setTeacherId(int teacherId)
 {
     this->teacherId = teacherId;
@@ -88,8 +80,7 @@ std::string ScoreModel::toString() const
        << ", courseId=" << courseId
        << ", score=" << score
        << ", gpa=" << getGpa()
-       << ", examTime='" << examTime
-       << "', teacherId=" << teacherId
+       << ", teacherId=" << teacherId
        << "}";
     return ss.str();
 }

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>教师仪表盘 - 成绩管理系统</title>
+    <link rel="stylesheet" href="/css/common.css">
+</head>
+<body>
+    <header>
+        <a href="#" class="logo">成绩管理系统 - 教师端</a>
+        <div class="nav-links">
+            <a href="/teacher/dashboard">成绩录入</a>
+            <a href="/login">退出登录</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="card">
+            <div class="card-header">录入学生成绩</div>
+            <form id="addScoreForm">
+                <div class="form-group">
+                    <label for="studentNo">学生学号</label>
+                    <input type="text" id="studentNo" name="studentNo" required placeholder="输入学生学号">
+                </div>
+                <div class="form-group">
+                    <label for="courseId">课程</label>
+                    <select id="courseId" name="courseId" required>
+                        <option value="">请选择课程</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="score">成绩</label>
+                    <input type="number" id="score" name="score" min="0" max="100" required>
+                </div>
+                <button type="submit" class="btn">提交成绩</button>
+            </form>
+            <div id="message" class="mt-20"></div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">课程统计信息</div>
+            <div id="statsContainer">
+                <table id="statsTable">
+                    <thead>
+                        <tr>
+                            <th>课程名称</th>
+                            <th>总人数</th>
+                            <th>平均分</th>
+                            <th>及格率</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                      
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function loadCourses() {
+            fetch('/teacher/courses')
+                .then(response => response.json())
+                .then(data => {
+                    const select = document.getElementById('courseId');
+                    data.forEach(course => {
+                        const option = document.createElement('option');
+                        option.value = course.id;
+                        option.textContent = `${course.courseName} (${course.courseNo})`;
+                        select.appendChild(option);
+                    });
+                });
+        }
+
+        function loadStats() {
+            fetch('/teacher/stats')
+                .then(response => response.json())
+                .then(data => {
+                    const tbody = document.querySelector('#statsTable tbody');
+                    tbody.innerHTML = '';
+                    if (data.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="4">暂无统计数据</td></tr>';
+                        return;
+                    }
+                    data.forEach(stat => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${stat.courseName}</td>
+                            <td>${stat.total}</td>
+                            <td>${stat.avg}</td>
+                            <td>${stat.passRate}%</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                });
+        }
+
+        document.getElementById('addScoreForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const data = new URLSearchParams(formData);
+
+            fetch('/teacher/addScore', {
+                method: 'POST',
+                body: data
+            })
+            .then(response => response.text())
+            .then(result => {
+                const msgDiv = document.getElementById('message');
+                msgDiv.textContent = result;
+                if (result.includes('success')) {
+                    msgDiv.style.color = 'green';
+                    this.reset();
+                    loadStats(); // 刷新统计数据
+                } else {
+                    msgDiv.style.color = 'red';
+                }
+            })
+            .catch(error => {
+                document.getElementById('message').textContent = '提交失败';
+                document.getElementById('message').style.color = 'red';
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCourses();
+            loadStats();
+        });
+    </script>
+</body>
+</html>

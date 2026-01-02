@@ -5,19 +5,15 @@
 class CourseModel
 {
 private:
-    int id;                  // 课程ID（唯一标识，数据库自增）
+    int id;                  // 课程ID
     std::string courseNo;    // 课程号（如：CS101）
-    std::string courseName;  // 课程名称（如：C++程序设计）
-    int credit;              // 学分（关键字段：用于加权平均绩点计算）
-    int teacherId;           // 授课教师ID（外键：关联teacher表）
-    std::string description; // 课程描述（如课程简介）
+    std::string courseName;  // 课程名称
+    int credit;              // 学分
+    int teacherId;           // 授课教师ID（关联teacher表）
+    std::string description; // 课程描述
 
 public:
-    // 默认构造函数：初始化所有成员变量为默认值
     CourseModel();
-
-    // 带参构造函数（创建新课程，无ID，ID由数据库生成）
-    CourseModel(const std::string &courseNo, const std::string &courseName, int credit, int teacherId, const std::string &description);
 
     // 带参构造函数（从数据库加载课程，包含完整ID）
     CourseModel(int id, const std::string &courseNo, const std::string &courseName, int credit, int teacherId, const std::string &description);
@@ -26,7 +22,7 @@ public:
     int getId() const;
     std::string getCourseNo() const;
     std::string getCourseName() const;
-    int getCredit() const; // 学分：加权平均绩点计算的核心
+    int getCredit() const;
     int getTeacherId() const;
     std::string getDescription() const;
 
@@ -38,7 +34,7 @@ public:
     void setTeacherId(int teacherId);
     void setDescription(const std::string &description);
 
-    // 调试辅助方法：将课程对象转换为字符串，便于输出测试
+    //将课程对象转换为字符串
     std::string toString() const;
 };
 #endif

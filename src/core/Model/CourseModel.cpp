@@ -3,8 +3,6 @@
 
 CourseModel::CourseModel() : id(0), credit(0), teacherId(0) {}
 
-CourseModel::CourseModel(const std::string &courseNo, const std::string &courseName, int credit, int teacherId, const std::string &description) :id(0), courseNo(courseNo), courseName(courseName), credit(credit), teacherId(teacherId), description(description) {}
-
 CourseModel::CourseModel(int id, const std::string &courseNo, const std::string &courseName, int credit, int teacherId, const std::string &description) : id(id), courseNo(courseNo), courseName(courseName), credit(credit), teacherId(teacherId), description(description) {}
 
 int CourseModel::getId() const
@@ -40,7 +38,7 @@ void CourseModel::setCourseNo(const std::string &courseNo)
 {
     this->courseNo = courseNo;
 }
-void CourseModel::setCourseName(const std::string&courseName)
+void CourseModel::setCourseName(const std::string &courseName)
 {
     this->courseName = courseName;
 }
@@ -56,7 +54,6 @@ void CourseModel::setDescription(const std::string &description)
 {
     this->description = description;
 }
-
 
 std::string CourseModel::toString() const
 {

@@ -12,13 +12,13 @@
 class StudentModel
 {
 private:
-    int id;                // 学生ID（数据库自增主键）
-    std::string studentNo; // 学号（如：2023001，业务唯一标识）
+    int id;                // 学生ID
+    std::string studentNo; // 学号
     std::string name;      // 学生姓名
-    std::string gender;    // 性别（如：男/女）
-    std::string major;     // 专业（如：计算机科学与技术）
-    std::string grade;     // 年级（如：2023级）
-    std::string phone;     // 联系电话（可选，用于通知）
+    std::string gender;    // 性别
+    std::string major;     // 专业
+    std::string grade;     // 年级
+    std::string phone;     // 联系电话
 
 public:
     // 默认构造函数：初始化成员变量为默认值

@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理员仪表盘 - 成绩管理系统</title>
+    <link rel="stylesheet" href="/css/common.css">
+</head>
+<body>
+    <header>
+        <a href="#" class="logo">成绩管理系统 - 管理员</a>
+        <div class="nav-links">
+            <a href="/admin/dashboard">用户管理</a>
+            <a href="/login">退出登录</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="card">
+            <div class="card-header">添加用户</div>
+            <form id="addUserForm">
+                <div class="form-group">
+                    <label for="username">用户名</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">密码</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <div class="form-group">
+                    <label for="role">角色</label>
+                    <select id="role" name="role" required>
+                        <option value="2">教师</option>
+                        <option value="3">学生</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="name">姓名</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="no">学号/工号</label>
+                    <input type="text" id="no" name="no" required>
+                </div>
+                <div class="form-group">
+                    <label for="gender">性别</label>
+                    <select id="gender" name="gender">
+                        <option value="男">男</option>
+                        <option value="女">女</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn">添加用户</button>
+            </form>
+            <div id="userMessage" class="mt-20"></div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">系统用户列表</div>
+            <table id="userTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>用户名</th>
+                        <th>角色</th>
+                        <th>关联ID</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                  
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <div class="card-header">添加课程</div>
+            <form id="addCourseForm">
+                <div class="form-group">
+                    <label for="courseNo">课程号</label>
+                    <input type="text" id="courseNo" name="courseNo" required>
+                </div>
+                <div class="form-group">
+                    <label for="courseName">课程名称</label>
+                    <input type="text" id="courseName" name="courseName" required>
+                </div>
+                <div class="form-group">
+                    <label for="credit">学分</label>
+                    <input type="number" id="credit" name="credit" required>
+                </div>
+                <div class="form-group">
+                    <label for="teacherId">授课教师</label>
+                    <select id="teacherId" name="teacherId" required>
+                        <option value="">请选择教师</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="description">描述</label>
+                    <input type="text" id="description" name="description">
+                </div>
+                <button type="submit" class="btn">添加课程</button>
+            </form>
+            <div id="courseMessage" class="mt-20"></div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">课程列表</div>
+            <table id="courseTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>课程号</th>
+                        <th>课程名</th>
+                        <th>学分</th>
+                        <th>教师ID</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                   
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+   
+    <div id="editUserModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('editUserModal')">&times;</span>
+            <h2>编辑用户</h2>
+            <form id="editUserForm">
+                <input type="hidden" id="editUserId" name="userId">
+                <div class="form-group">
+                    <label for="editUsername">用户名</label>
+                    <input type="text" id="editUsername" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="editPassword">密码 (留空不修改)</label>
+                    <input type="password" id="editPassword" name="password">
+                </div>
+                <div class="form-group">
+                    <label for="editName">姓名</label>
+                    <input type="text" id="editName" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="editNo">学号/工号</label>
+                    <input type="text" id="editNo" name="no" required>
+                </div>
+                <div class="form-group">
+                    <label for="editGender">性别</label>
+                    <select id="editGender" name="gender">
+                        <option value="男">男</option>
+                        <option value="女">女</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn">保存修改</button>
+            </form>
+        </div>
+    </div>
+
+    
+    <div id="editCourseModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('editCourseModal')">&times;</span>
+            <h2>编辑课程</h2>
+            <form id="editCourseForm">
+                <input type="hidden" id="editCourseId" name="courseId">
+                <div class="form-group">
+                    <label for="editCourseNo">课程号</label>
+                    <input type="text" id="editCourseNo" name="courseNo" required>
+                </div>
+                <div class="form-group">
+                    <label for="editCourseName">课程名称</label>
+                    <input type="text" id="editCourseName" name="courseName" required>
+                </div>
+                <div class="form-group">
+                    <label for="editCredit">学分</label>
+                    <input type="number" id="editCredit" name="credit" required>
+                </div>
+                <div class="form-group">
+                    <label for="editTeacherId">授课教师ID</label>
+                    <input type="text" id="editTeacherId" name="teacherId" required>
+                </div>
+                <div class="form-group">
+                    <label for="editDescription">描述</label>
+                    <input type="text" id="editDescription" name="description">
+                </div>
+                <button type="submit" class="btn">保存修改</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = "none";
+        }
+
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = "none";
+            }
+        }
+
+        function loadUsers() {
+            fetch('/admin/users')
+                .then(response => response.json())
+                .then(data => {
+                    const tbody = document.querySelector('#userTable tbody');
+                    const teacherSelect = document.getElementById('teacherId');
+                    
+                    // 清除除第一个选项以外的现有选项
+                    while (teacherSelect.options.length > 1) {
+                        teacherSelect.remove(1);
+                    }
+
+                    tbody.innerHTML = '';
+                    data.forEach((user, index) => {
+                        const tr = document.createElement('tr');
+                        let roleName = '未知';
+                        if (user.role === 1) roleName = '管理员';
+                        else if (user.role === 2) {
+                            roleName = '教师';
+                            // 添加到教师选择下拉菜单
+                            const option = document.createElement('option');
+                            option.value = user.relatedId; // 使用 relatedId (教师 ID)
+                            option.textContent = `${user.username} (ID: ${user.relatedId})`;
+                            teacherSelect.appendChild(option);
+                        }
+                        else if (user.role === 3) roleName = '学生';
+
+                        const userJson = JSON.stringify(user).replace(/"/g, '&quot;');
+
+                        tr.innerHTML = `
+                            <td>${user.id}</td>
+                            <td>${user.username}</td>
+                            <td>${roleName}</td>
+                            <td>${user.relatedId}</td>
+                            <td>
+                                <button class="btn" onclick="editUser(${userJson})">编辑</button>
+                                <button class="btn btn-danger" onclick="deleteUser(${user.id})">删除</button>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                });
+        }
+
+        function editUser(user) {
+            document.getElementById('editUserId').value = user.id;
+            document.getElementById('editUsername').value = user.username;
+            document.getElementById('editPassword').value = ''; 
+            document.getElementById('editName').value = user.name || '';
+            document.getElementById('editNo').value = user.no || '';
+            document.getElementById('editGender').value = user.gender || '男';
+            
+            document.getElementById('editUserModal').style.display = "block";
+        }
+
+        function loadCourses() {
+            fetch('/admin/courses')
+                .then(response => response.json())
+                .then(data => {
+                    const tbody = document.querySelector('#courseTable tbody');
+                    tbody.innerHTML = '';
+                    data.forEach((course, index) => {
+                        const tr = document.createElement('tr');
+                        const courseJson = JSON.stringify(course).replace(/"/g, '&quot;');
+                        
+                        tr.innerHTML = `
+                            <td>${course.id}</td>
+                            <td>${course.courseNo}</td>
+                            <td>${course.courseName}</td>
+                            <td>${course.credit}</td>
+                            <td>${course.teacherId}</td>
+                            <td>
+                                <button class="btn" onclick="editCourse(${courseJson})">编辑</button>
+                                <button class="btn btn-danger" onclick="deleteCourse(${course.id})">删除</button>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                });
+        }
+
+        function editCourse(course) {
+            document.getElementById('editCourseId').value = course.id;
+            document.getElementById('editCourseNo').value = course.courseNo;
+            document.getElementById('editCourseName').value = course.courseName;
+            document.getElementById('editCredit').value = course.credit;
+            document.getElementById('editTeacherId').value = course.teacherId;
+            document.getElementById('editDescription').value = course.description || '';
+            
+            document.getElementById('editCourseModal').style.display = "block";
+        }
+
+        function deleteUser(id) {
+            if(confirm('确定要删除该用户吗？')) {
+                fetch('/admin/deleteUser', { 
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'userId=' + id
+                })
+                .then(res => {
+                    loadUsers();
+                });
+            }
+        }
+
+        function deleteCourse(id) {
+            if(confirm('确定要删除该课程吗？')) {
+                fetch('/admin/deleteCourse', { 
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'courseId=' + id
+                })
+                .then(res => {
+                    if (res.ok) {
+                        loadCourses();
+                    } else {
+                        res.text().then(text => alert('删除失败: ' + text));
+                    }
+                })
+                .catch(err => alert('请求失败'));
+            }
+        }
+
+        document.getElementById('addUserForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const data = new URLSearchParams(formData);
+
+            fetch('/admin/addUser', {
+                method: 'POST',
+                body: data
+            })
+            .then(response => response.text())
+            .then(result => {
+                const msgDiv = document.getElementById('userMessage');
+                msgDiv.textContent = result;
+                msgDiv.style.color = 'green';
+                this.reset();
+                loadUsers();
+            })
+            .catch(error => {
+                document.getElementById('userMessage').textContent = '添加失败';
+                document.getElementById('userMessage').style.color = 'red';
+            });
+        });
+
+        document.getElementById('addCourseForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const data = new URLSearchParams(formData);
+
+            fetch('/admin/addCourse', {
+                method: 'POST',
+                body: data
+            })
+            .then(response => response.text())
+            .then(result => {
+                const msgDiv = document.getElementById('courseMessage');
+                msgDiv.textContent = result;
+                msgDiv.style.color = 'green';
+                this.reset();
+                loadCourses();
+            })
+            .catch(error => {
+                document.getElementById('courseMessage').textContent = '添加失败';
+                document.getElementById('courseMessage').style.color = 'red';
+            });
+        });
+
+        // Edit User Form Submission
+        document.getElementById('editUserForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const data = new URLSearchParams(formData);
+
+            fetch('/admin/updateUser', {
+                method: 'POST',
+                body: data
+            })
+            .then(response => {
+                if (response.ok) {
+                    closeModal('editUserModal');
+                    loadUsers();
+                    alert('用户更新成功');
+                } else {
+                    response.text().then(text => alert('更新失败: ' + text));
+                }
+            })
+            .catch(error => {
+                alert('请求失败');
+            });
+        });
+
+        // Edit Course Form Submission
+        document.getElementById('editCourseForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const data = new URLSearchParams(formData);
+
+            fetch('/admin/updateCourse', {
+                method: 'POST',
+                body: data
+            })
+            .then(response => {
+                if (response.ok) {
+                    closeModal('editCourseModal');
+                    loadCourses();
+                    alert('课程更新成功');
+                } else {
+                    response.text().then(text => alert('更新失败: ' + text));
+                }
+            })
+            .catch(error => {
+                alert('请求失败');
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadUsers();
+            loadCourses();
+        });
+    </script>
+</body>
+</html>

@@ -5,8 +5,7 @@
 #include "../core/Model/ScoreModel.h" // 依赖成绩模型
 #include "../utils/SqliteUtils.h"     // 依赖SQLite工具类
 
-
-//功能：封装成绩数据的数据库操作（增删改查）
+// 功能：封装成绩数据的数据库操作（增删改查）
 class ScoreDao
 {
 public:
@@ -27,9 +26,6 @@ public:
     // 根据课程ID查询成绩列表（教师查看自己课程的所有学生成绩）
     std::vector<ScoreModel> selectByCourseId(int courseId);
 
-    //查询所有成绩（管理员统计/管理所有成绩）
-    std::vector<ScoreModel> selectAll();
-
     // 更新成绩（教师修改成绩）
     bool update(const ScoreModel &score);
 
@@ -44,4 +40,4 @@ private:
     sqlite3 *db;
 };
 
-#endif 
+#endif

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学生仪表盘 - 成绩管理系统</title>
+    <link rel="stylesheet" href="/css/common.css">
+</head>
+<body>
+    <header>
+        <a href="#" class="logo">成绩管理系统</a>
+        <div class="nav-links">
+            <a href="/student/dashboard" class="active">我的成绩</a>
+            <a href="/login">退出登录</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <span>我的成绩单</span>
+                <span style="float: right;">平均绩点 (GPA): <strong>{{GPA}}</strong></span>
+            </div>
+            <table id="scoreTable">
+                <thead>
+                    <tr>
+                        <th>序号</th>
+                        <th>课程名称</th>
+                        <th>成绩</th>
+                        <th>绩点</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Data will be loaded here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('/student/scores')
+                .then(response => response.json())
+                .then(data => {
+                    const tbody = document.querySelector('#scoreTable tbody');
+                    tbody.innerHTML = '';
+                    
+                    if (data.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="4" class="text-center">暂无成绩记录</td></tr>';
+                        return;
+                    }
+
+                    data.forEach((score, index) => {
+                        const tr = document.createElement('tr');
+                        // 计算 GPA (简单的 4.0 刻度近似值)
+                        let gpa = 0;
+                        if (score.score >= 90) gpa = 4.0;
+                        else if (score.score >= 85) gpa = 3.7;
+                        else if (score.score >= 82) gpa = 3.3;
+                        else if (score.score >= 78) gpa = 3.0;
+                        else if (score.score >= 75) gpa = 2.7;
+                        else if (score.score >= 72) gpa = 2.3;
+                        else if (score.score >= 68) gpa = 2.0;
+                        else if (score.score >= 64) gpa = 1.5;
+                        else if (score.score >= 60) gpa = 1.0;
+                        else gpa = 0;
+
+                        tr.innerHTML = `
+                            <td>${index + 1}</td>
+                            <td>${score.courseName}</td>
+                            <td>${score.score}</td>
+                            <td>${gpa.toFixed(1)}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.querySelector('#scoreTable tbody').innerHTML = 
+                        '<tr><td colspan="4" class="text-center" style="color:red;">加载失败</td></tr>';
+                });
+        });
+    </script>
+</body>
+</html>
