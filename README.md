@@ -4,106 +4,83 @@
 ![Build](https://img.shields.io/badge/Build-CMake-green)
 ![Database](https://img.shields.io/badge/Database-SQLite3-lightgrey)
 
-一个基于 C++17 开发的轻量级成绩管理系统，内置自定义 HTTP 服务器，提供 Web 界面进行操作。支持管理员、教师、学生三种角色的权限管理与业务流程。
+这是一个基于 C++17 开发的轻量级成绩管理系统，内置了自定义的 HTTP 服务器，通过 Web 界面提供交互。系统设计了三种角色：管理员、教师和学生，分别对应不同的业务功能。
 
-## ✨ 功能特性
+## ✨ 功能介绍
+
+根据您的需求，系统实现了以下核心功能：
 
 ### 👨‍💼 管理员 (Admin)
-- **用户管理**：新增/删除学生和教师用户，查看所有用户列表。
-- **课程管理**：新增/删除课程，查看所有课程信息。
-- **系统维护**：拥有最高权限，维护基础数据。
+拥有系统的最高权限，主要负责基础数据的维护。
+- **账号管理**：可以添加**学生**和**教师**的账号，管理系统用户。
+- **课程管理**：负责**添加课程**信息，为教学活动做好准备。
 
 ### 👩‍🏫 教师 (Teacher)
-- **成绩录入**：为所教授的课程录入学生成绩。
-- **数据统计**：查看课程的平均分、及格率等统计信息。
+负责具体的教学评估工作。
+- **成绩录入**：为自己教授的课程给学生**打分**（录入成绩）。
+- **统计分析**：可以查看课程的**及格率**和**平均分**，掌握班级整体学习情况。
 
 ### 👨‍🎓 学生 (Student)
-- **成绩查询**：查看自己的课程成绩。
-- **绩点计算**：自动计算课程绩点 (GPA)。
+系统的最终服务对象。
+- **成绩查询**：登录后可以查看自己**各科的成绩**。
+- **绩点查询**：系统会自动计算并显示**绩点 (GPA)**，方便学生了解学业水平。
 
 ## 🛠 技术栈
 
 - **编程语言**: C++17
-- **构建工具**: CMake
-- **数据库**: SQLite3 (嵌入式)
-- **网络框架**: 自研轻量级 HTTP Server (基于 Winsock2)
-- **前端技术**: HTML5, CSS3, JavaScript (原生)
-
-## 🚀 快速开始
-
-### 环境要求
-- Windows 操作系统
-- MinGW-w64 (g++)
-- CMake (3.10+)
-
-### 方式一：使用脚本 (推荐)
-
-1. **编译项目**
-   双击运行 `compile.bat`，脚本会自动检测环境并完成编译。
-   编译成功后，可执行文件将生成在 `bin/` 目录下。
-
-2. **启动服务**
-   双击运行 `start_server.bat` 启动 Web 服务器。
-
-### 方式二：手动编译
-
-```bash
-# 1. 创建构建目录
-mkdir build
-cd build
-
-# 2. 生成构建文件 (使用 MinGW Makefiles)
-cmake -G "MinGW Makefiles" ..
-
-# 3. 编译
-cmake --build .
-
-# 4. 运行 (回到项目根目录)
-cd ..
-# 将生成的 webServer.exe 移动到根目录或直接运行
-./build/webServer.exe
-```
-
-启动成功后，打开浏览器访问：`http://127.0.0.1:8080`
+- **构建系统**: CMake
+- **数据库**: SQLite3 (轻量级嵌入式数据库)
+- **网络核心**: 自研 HTTP Server (基于 Winsock2 Socket 编程)
+- **前端界面**: HTML / CSS / JavaScript
 
 ## 📂 项目结构
 
-```
+```text
 ScoreManagementSystem/
 ├── bin/                 # 编译输出目录 (可执行文件)
 ├── build/               # CMake 构建中间文件
-├── conf/                # 配置文件
-│   └── server.ini       # 服务器端口与数据库配置
-├── lib/                 # 第三方库 (SQLite3)
-├── res/                 # 静态资源文件
-│   ├── public/          # CSS, JS
-│   └── view/            # HTML 模板 (Admin, Teacher, Student)
+├── conf/                # 配置文件 (server.ini)
+├── lib/                 # 第三方库 (sqlite)
+├── res/                 # 静态资源
+│   ├── public/          # CSS, JS, Images
+│   └── view/            # HTML 页面模板 (admin, teacher, user)
 ├── src/                 # 源代码
 │   ├── config/          # 配置读取
-│   ├── core/            # 核心业务 (Controller, Model)
-│   ├── dao/             # 数据访问层 (DAO)
-│   ├── network/         # 网络层 (HttpServer, Request, Response)
-│   ├── service/         # 业务逻辑层 (Service)
-│   └── utils/           # 工具类 (MD5, SqliteHelper)
-├── CMakeLists.txt       # CMake 构建配置
-├── compile.bat          # 编译脚本
-├── start_server.bat     # 启动脚本
-└── main.cpp             # 程序入口
+│   ├── core/            # 核心业务逻辑 (Controller, Model)
+│   ├── dao/             # 数据访问层 (Data Access Object)
+│   ├── network/         # HTTP 服务器实现
+│   ├── service/         # 业务逻辑层
+│   └── utils/           # 工具类 (Log, MD5, Sqlite)
+├── CMakeLists.txt       # CMake 构建脚本
+├── compile.bat          # 一键编译脚本
+└── start_server.bat     # 启动服务脚本
 ```
 
-## 📝 配置说明
+## 🚀 快速开始
 
-配置文件位于 `conf/server.ini`，可修改服务器端口和数据库路径：
+### 1. 环境准备
+确保您的 Windows 系统已安装：
+- C++ 编译器 (推荐 MinGW-w64)
+- CMake (3.10 或更高版本)
 
-```ini
-[server]
-port = 8080
-
-[database]
-path = score_system.db
+### 2. 编译项目
+我们提供了一键编译脚本，双击运行项目根目录下的 `compile.bat`：
+```cmd
+compile.bat
 ```
+脚本会自动创建构建目录、运行 CMake 配置并生成可执行文件 `webServer.exe`。
 
-## ⚠️ 注意事项
+### 3. 运行服务
+编译成功后，双击运行 `start_server.bat` 或直接在终端运行：
+```cmd
+./webServer.exe
+```
+服务器启动后，请在浏览器中访问控制台输出的地址（通常是 `http://localhost:8080`）。
 
-- 默认管理员账号通常在数据库初始化时生成，或需手动插入。
-- 确保 `res/` 和 `conf/` 目录与可执行文件在同一级或正确的工作目录下，否则可能出现 404 错误。
+## 📝 数据库说明
+项目使用 SQLite 数据库，数据库文件通常会在第一次运行时自动初始化。
+- 用户表 (user)
+- 学生表 (student)
+- 教师表 (teacher)
+- 课程表 (course)
+- 成绩表 (score)
