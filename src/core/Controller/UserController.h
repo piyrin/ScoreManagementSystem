@@ -15,7 +15,7 @@ class UserController
 public:
     UserController();
 
-    // 显示用户仪表盘页面
+    // 显示用户页面
     void showDashboard(const HttpRequest &req, HttpResponse &res);
 
     // 获取学生成绩列表

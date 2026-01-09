@@ -13,10 +13,10 @@
 enum class AdminOpResult
 {
     SUCCESS,        // 操作成功
-    ROLE_ERROR,     // 角色错误（非管理员）
-    PARAM_ERROR,    // 参数错误（必填项为空/无效）
+    ROLE_ERROR,     // 角色错误
+    PARAM_ERROR,    // 参数错误
     NOT_FOUND,      // 未找到用户/课程/成绩
-    DUPLICATE_DATA, // 数据重复（用户名/学号/工号/课程号已存在）
+    DUPLICATE_DATA, // 数据重复
     SYSTEM_ERROR    // 系统错误
 };
 

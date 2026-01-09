@@ -22,9 +22,6 @@ public:
     StudentService();
     ~StudentService();
 
-    // 查询个人信息，通过登录后的UserModel获取relatedId=student.id
-    StudentModel getStudentInfo(const UserModel &login_user);
-
     // 查询个人所有成绩
     std::vector<ScoreModel> getMyScore(const UserModel &login_user);
 

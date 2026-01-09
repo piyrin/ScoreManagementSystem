@@ -19,4 +19,4 @@ private:
     AuthService authService; // 认证业务服务
 };
 
-#endif // AUTHCONTROLLER_H
+#endif

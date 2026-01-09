@@ -58,47 +58,6 @@ bool ScoreDao::insert(const ScoreModel &score)
     }
 }
 
-// 2. 根据ID查询成绩
-ScoreModel ScoreDao::selectById(int id)
-{
-    if (this->db == nullptr)
-        return ScoreModel();
-
-    // SQL语句：根据id查询成绩
-    std::string sql = "SELECT id, studentId, courseId, teacherId, score FROM score WHERE id = ?;";
-    sqlite3_stmt *stmt = nullptr;
-    int ret = sqlite3_prepare_v2(this->db, sql.c_str(), -1, &stmt, nullptr);
-    if (ret != SQLITE_OK)
-    {
-        std::cerr << "ScoreDao查询失败:SQL准备错误 - " << sqlite3_errmsg(this->db) << std::endl;
-        sqlite3_finalize(stmt);
-        return ScoreModel();
-    }
-
-    sqlite3_bind_int(stmt, 1, id);
-
-    ScoreModel score;
-    ret = sqlite3_step(stmt);
-    if (ret == SQLITE_ROW)
-    {
-        int dbId = sqlite3_column_int(stmt, 0);
-        int studentId = sqlite3_column_int(stmt, 1);
-        int courseId = sqlite3_column_int(stmt, 2);
-        int teacherId = sqlite3_column_int(stmt, 3);
-        double scoreVal = sqlite3_column_double(stmt, 4);
-
-        // 构造ScoreModel对象（含id）
-        score = ScoreModel(dbId, studentId, courseId, scoreVal, teacherId);
-    }
-    else
-    {
-        std::cout << "ScoreDao查询失败:未找到ID为" << id << "的成绩" << std::endl;
-    }
-
-    sqlite3_finalize(stmt);
-    return score;
-}
-
 // 3. 根据学生ID查询成绩列表
 std::vector<ScoreModel> ScoreDao::selectByStudentId(int studentId)
 {

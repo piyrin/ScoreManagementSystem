@@ -17,7 +17,7 @@ public:
     // 新增用户（注册）
     bool insert(const UserModel &user);
 
-    // 根据用户名查询用户（登录校验）
+    // 根据用户名查询用户
     UserModel selectByUsername(const std::string &username);
 
     // 根据ID查询用户

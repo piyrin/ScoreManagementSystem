@@ -43,37 +43,6 @@ bool TeacherService::checkCoursePermission(const UserModel &login_user, int cour
     return true;
 }
 
-TeacherModel TeacherService::getTeacherInfo(const UserModel &login_user)
-{
-    if (login_user.getRole() != UserRole::TEACHER)
-    {
-        std::cerr << "教师信息查询失败：角色错误(当前角色：" << login_user.getRoleStr() << ")" << std::endl;
-        return TeacherModel();
-    }
-
-    // 从UserModel中获取关联的teacher.id
-    int teacher_id = login_user.getRelatedId();
-    if (teacher_id == 0)
-    {
-        std::cerr << "教师信息查询失败:关联ID无效" << std::endl;
-        return TeacherModel();
-    }
-
-    // 调用Dao层查询教师信息
-    TeacherModel teacher = teacher_dao->selectById(teacher_id);
-    {
-        if (teacher.getId() == 0)
-        {
-            std::cerr << "教师信息查询失败:未找到ID为" << teacher_id << "的教师" << std::endl;
-        }
-        else
-        {
-            std::cout << "教师信息查询成功：" << teacher.toString() << std::endl;
-        }
-        return teacher;
-    }
-}
-
 std::vector<CourseModel> TeacherService::getMyCourse(const UserModel &login_user)
 {
     vector<CourseModel> courses;

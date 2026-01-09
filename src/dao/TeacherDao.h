@@ -15,19 +15,19 @@ public:
 
     ~TeacherDao();
 
-    // 新增教师（用于教师注册/管理员添加教师）
+    // 新增教师
     bool insert(const TeacherModel &teacher);
 
-    // 根据ID查询教师（用于加载教师详情）
+    // 根据ID查询教师
     TeacherModel selectById(int id);
 
-    // 根据工号查询教师（用于登录校验、工号唯一性校验）
+    // 根据工号查询教师
     TeacherModel selectByTeacherNo(const std::string &teacherNo);
 
-    // 更新教师信息（用于教师修改个人资料）
+    // 更新教师信息
     bool update(const TeacherModel &teacher);
 
-    // 根据ID删除教师（用于管理员删除教师）
+    // 根据ID删除教师
     bool deleteById(int id);
 
 private:

@@ -15,7 +15,7 @@ public:
     AdminController();
     void showDashboard(const HttpRequest &req, HttpResponse &res);
 
-    // 获取用户列表 (JSON格式)
+    // 获取用户列表 
     void listUsers(const HttpRequest &req, HttpResponse &res);
 
     // 添加新用户
@@ -36,7 +36,7 @@ public:
     // 更新课程信息
     void updateCourse(const HttpRequest &req, HttpResponse &res);
 
-    // 获取课程列表 (JSON格式)
+    // 获取课程列表 
     void listCourses(const HttpRequest &req, HttpResponse &res);
 
 private:
@@ -49,4 +49,4 @@ private:
     UserModel getUserFromRequest(const HttpRequest &req);
 };
 
-#endif // ADMINCONTROLLER_H
+#endif 

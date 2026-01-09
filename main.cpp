@@ -84,8 +84,8 @@ int main()
     server.registerHandler("/admin/courses", [&](const HttpRequest &req, HttpResponse &res)
                            { adminController.listCourses(req, res); });
 
-    std::cout << "Starting server on port " << port << "..." << std::endl;
-    std::cout << "Open http://127.0.0.1:" << port << " in your browser." << std::endl;
+    std::cout << "正在启动服务器，端口 " << port << "..." << std::endl;
+    std::cout << "请在浏览器中访问 http://127.0.0.1:" << port << std::endl;
 
     server.start();
 

@@ -41,14 +41,13 @@ void AuthController::login(const HttpRequest &req, HttpResponse &res)
         else if (user.getRole() == UserRole::TEACHER)
         {
             res.setStatusCode(302);
-            res.setHeader("Location", "/teacher/dashboard"); // 假设教师仪表盘
+            res.setHeader("Location", "/teacher/dashboard"); 
         }
         else if (user.getRole() == UserRole::STUDENT)
         {
             res.setStatusCode(302);
-            res.setHeader("Location", "/student/dashboard"); // 假设学生仪表盘
+            res.setHeader("Location", "/student/dashboard"); 
         }
-        // 如果需要，在此处设置会话/cookie（目前简化处理）
         res.setHeader("Set-Cookie", "user_id=" + std::to_string(user.getId()) + "; Path=/");
     }
     else

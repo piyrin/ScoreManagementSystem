@@ -22,7 +22,7 @@ AuthService::~AuthService()
 // 登录：校验用户名+密码，返回用户信息
 LoginResult AuthService::login(const std::string &username, const std::string &password, UserModel &out_user)
 {
-    // 查询用户（通过用户名）
+    // 查询用户
     UserModel db_user = user_dao->selectByUsername(username);
     if (db_user.getId() == 0)
     {
@@ -30,7 +30,7 @@ LoginResult AuthService::login(const std::string &username, const std::string &p
         return LoginResult::USER_NOT_FOUND;
     }
 
-    // 对比密码（明文加密后 vs 数据库存储的加密串）
+    // 对比密码
     std::string encrypted_pwd = MD5Utils::encrypt(password);
     if (encrypted_pwd != db_user.getPassword())
     {
@@ -44,7 +44,7 @@ LoginResult AuthService::login(const std::string &username, const std::string &p
     return LoginResult::SUCCESS;
 }
 
-// 密码重置（验证原密码后更新）
+// 密码重置
 bool AuthService::resetPassword(const std::string &username, const std::string &old_pwd, const std::string &new_pwd)
 {
     // 校验参数
@@ -69,7 +69,7 @@ bool AuthService::resetPassword(const std::string &username, const std::string &
         return false;
     }
 
-    // 更新新密码（加密后）
+    // 更新新密码
     bool result = user_dao->updatePassword(db_user.getId(), MD5Utils::encrypt(new_pwd));
     if (result)
     {

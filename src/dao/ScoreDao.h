@@ -2,10 +2,10 @@
 #define SCORE_DAO_H
 
 #include <vector>
-#include "../core/Model/ScoreModel.h" // 依赖成绩模型
-#include "../utils/SqliteUtils.h"     // 依赖SQLite工具类
+#include "../core/Model/ScoreModel.h" 
+#include "../utils/SqliteUtils.h"    
 
-// 功能：封装成绩数据的数据库操作（增删改查）
+// 功能：封装成绩数据的数据库操作
 class ScoreDao
 {
 public:
@@ -17,26 +17,23 @@ public:
     // 新增成绩，教师录入成绩
     bool insert(const ScoreModel &score);
 
-    // 根据ID查询成绩
-    ScoreModel selectById(int id);
-
-    // 根据学生ID查询成绩列表（学生查看自己的所有成绩）
+    // 根据学生ID查询成绩列表
     std::vector<ScoreModel> selectByStudentId(int studentId);
 
-    // 根据课程ID查询成绩列表（教师查看自己课程的所有学生成绩）
+    // 根据课程ID查询成绩列表
     std::vector<ScoreModel> selectByCourseId(int courseId);
 
-    // 更新成绩（教师修改成绩）
+    // 更新成绩
     bool update(const ScoreModel &score);
 
-    // 根据ID删除成绩（管理员/教师删除错误成绩）
+    // 根据ID删除成绩
     bool deleteById(int id);
 
-    // 根据学生ID和课程ID查询成绩（校验重复）
+    // 根据学生ID和课程ID查询成绩
     std::vector<ScoreModel> selectByStudentIdAndCourseId(int studentId, int courseId);
 
 private:
-    // SQLite数据库连接句柄（通过SqliteUtils获取）
+    // SQLite数据库连接句柄
     sqlite3 *db;
 };
 

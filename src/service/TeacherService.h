@@ -31,9 +31,6 @@ public:
     TeacherService();
     ~TeacherService();
 
-    // 查询个人信息，通过用户登录的relatedId=teacher.id
-    TeacherModel getTeacherInfo(const UserModel &login_user);
-
     // 查询所教授课程列表，关联course的teacherId
     std::vector<CourseModel> getMyCourse(const UserModel &login_user);
 

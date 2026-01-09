@@ -12,7 +12,7 @@ HttpServer::HttpServer(int port) : port(port), serverSocket(INVALID_SOCKET), isR
     int result = WSAStartup(MAKEWORD(2, 2), &wsaData);
     if (result != 0)
     {
-        std::cerr << "WSAStartup failed: " << result << std::endl;
+        std::cerr << "WSAStartup 初始化失败: " << result << std::endl;
     }
 }
 
@@ -35,21 +35,21 @@ void HttpServer::start()
     std::string portStr = std::to_string(port);
     if (getaddrinfo(NULL, portStr.c_str(), &hints, &result) != 0)
     {
-        std::cerr << "getaddrinfo failed" << std::endl;
+        std::cerr << "获取地址信息失败" << std::endl;
         return;
     }
 
     serverSocket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
     if (serverSocket == INVALID_SOCKET)
     {
-        std::cerr << "Error at socket(): " << WSAGetLastError() << std::endl;
+        std::cerr << "创建套接字失败: " << WSAGetLastError() << std::endl;
         freeaddrinfo(result);
         return;
     }
 
     if (bind(serverSocket, result->ai_addr, (int)result->ai_addrlen) == SOCKET_ERROR)
     {
-        std::cerr << "bind failed with error: " << WSAGetLastError() << std::endl;
+        std::cerr << "绑定端口失败，错误代码: " << WSAGetLastError() << std::endl;
         freeaddrinfo(result);
         closesocket(serverSocket);
         return;
@@ -59,20 +59,20 @@ void HttpServer::start()
 
     if (listen(serverSocket, SOMAXCONN) == SOCKET_ERROR)
     {
-        std::cerr << "Listen failed with error: " << WSAGetLastError() << std::endl;
+        std::cerr << "监听失败，错误代码: " << WSAGetLastError() << std::endl;
         closesocket(serverSocket);
         return;
     }
 
     isRunning = true;
-    std::cout << "Server started on port " << port << std::endl;
+    std::cout << "服务器启动成功，监听端口: " << port << std::endl;
 
     while (isRunning)
     {
         SOCKET clientSocket = accept(serverSocket, NULL, NULL);
         if (clientSocket == INVALID_SOCKET)
         {
-            std::cerr << "accept failed: " << WSAGetLastError() << std::endl;
+            std::cerr << "接受连接失败: " << WSAGetLastError() << std::endl;
             closesocket(serverSocket);
             break;
         }
@@ -136,9 +136,8 @@ void HttpServer::handleClient(SOCKET clientSocket)
             }
             else
             {
-                // 404 Not Found
                 res.setStatusCode(404);
-                res.setBody("<h1>404 Not Found</h1>");
+                res.setBody("<h1>404 未找到页面</h1>");
             }
         }
 
@@ -165,7 +164,7 @@ void HttpServer::handleStaticFile(const HttpRequest &req, HttpResponse &res, con
     else
     {
         res.setStatusCode(404);
-        res.setBody("<h1>File Not Found</h1>");
+        res.setBody("<h1>文件未找到</h1>");
     }
 }
 

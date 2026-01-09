@@ -48,11 +48,11 @@ void UserController::showDashboard(const HttpRequest &req, HttpResponse &res)
     std::string filePath;
     if (user.getRole() == UserRole::STUDENT)
     {
-        filePath = "res/view/user/dashboard.html"; // 假设共享或特定
+        filePath = "res/view/user/dashboard.html"; 
     }
     else if (user.getRole() == UserRole::TEACHER)
     {
-        filePath = "res/view/teacher/dashboard.html"; // 假设共享或特定
+        filePath = "res/view/teacher/dashboard.html";
     }
     else
     {
@@ -73,7 +73,7 @@ void UserController::showDashboard(const HttpRequest &req, HttpResponse &res)
             ss << std::fixed << std::setprecision(2) << gpa;
             std::string gpaStr = ss.str();
 
-            // 简单的字符串替换
+            // 字符串替换
             size_t pos = content.find("{{GPA}}");
             if (pos != std::string::npos)
             {
@@ -86,7 +86,7 @@ void UserController::showDashboard(const HttpRequest &req, HttpResponse &res)
     else
     {
         res.setStatusCode(404);
-        res.setBody("未找到仪表盘");
+        res.setBody("未找到界面");
     }
 }
 

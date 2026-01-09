@@ -102,8 +102,6 @@ void HttpRequest::parseQueryString(const std::string &queryString)
 void HttpRequest::parsePostParams(const std::string &bodyData)
 {
     // 简单解析 application/x-www-form-urlencoded
-    // 对于 multipart/form-data 或 json，需要更复杂的解析
-    // 暂时假设为 urlencoded，因为它对于简单表单很常见
     std::vector<std::string> pairs = split(bodyData, "&");
     for (const auto &pair : pairs)
     {

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>学生仪表盘 - 成绩管理系统</title>
+    <title>学生界面 - 成绩管理系统</title>
     <link rel="stylesheet" href="/css/common.css">
 </head>
 <body>
@@ -31,7 +31,6 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- Data will be loaded here -->
                 </tbody>
             </table>
         </div>
@@ -52,7 +51,7 @@
 
                     data.forEach((score, index) => {
                         const tr = document.createElement('tr');
-                        // 计算 GPA (简单的 4.0 刻度近似值)
+                        // 计算 GPA
                         let gpa = 0;
                         if (score.score >= 90) gpa = 4.0;
                         else if (score.score >= 85) gpa = 3.7;

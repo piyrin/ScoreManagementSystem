@@ -19,35 +19,6 @@ StudentService::~StudentService()
     delete course_dao;
 }
 
-// 查询个人信息
-StudentModel StudentService::getStudentInfo(const UserModel &login_user)
-{
-    if (login_user.getRole() != UserRole::STUDENT)
-    {
-        std::cerr << "学生信息查询失败：角色错误(当前角色：" << login_user.getRoleStr() << ")" << std::endl;
-        return StudentModel();
-    }
-
-    int student_id = login_user.getRelatedId();
-    if (student_id == 0)
-    {
-        std::cerr << "学生信息查询失败:关联ID无效" << std::endl;
-        return StudentModel();
-    }
-
-    StudentModel student = student_dao->selectById(student_id);
-    if (student.getId() == 0)
-    {
-        std::cerr << "学生信息查询失败:未找到ID为" << student_id << "的学生" << std::endl;
-    }
-    else
-    {
-        std::cout << "学生信息查询成功：" << student.toString() << std::endl;
-    }
-
-    return student;
-}
-
 // 查询个人成绩
 std::vector<ScoreModel> StudentService::getMyScore(const UserModel &login_user)
 {
