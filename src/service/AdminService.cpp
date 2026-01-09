@@ -4,7 +4,6 @@
 #include "../dao/TeacherDao.h"
 #include "../dao/CourseDao.h"
 #include "../dao/ScoreDao.h"
-#include "../utils/MD5Utils.h"
 #include <iostream>
 #include <iomanip>
 #include <cmath>
@@ -156,7 +155,7 @@ AdminOpResult AdminService::addStudentUser(const UserModel &login_admin, const s
         return AdminOpResult::SYSTEM_ERROR;
     }
 
-    UserModel new_user(0, username, MD5Utils::encrypt(password), UserRole::STUDENT, new_student.getId());
+    UserModel new_user(0, username, password, UserRole::STUDENT, new_student.getId());
     if (user_dao->insert(new_user))
     {
         std::cout << "新增学生用户成功：" << new_user.toString() << std::endl;
@@ -207,7 +206,7 @@ AdminOpResult AdminService::addTeacherUser(const UserModel &login_admin, const s
         return AdminOpResult::SYSTEM_ERROR;
     }
 
-    UserModel new_user(0, username, MD5Utils::encrypt(password), UserRole::TEACHER, new_teacher.getId());
+    UserModel new_user(0, username, password, UserRole::TEACHER, new_teacher.getId());
     if (user_dao->insert(new_user))
     {
         std::cout << "新增教师用户成功：" << new_user.toString() << std::endl;

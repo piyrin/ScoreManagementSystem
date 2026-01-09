@@ -2,7 +2,6 @@
 #include "../dao/UserDao.h"
 #include "../dao/StudentDao.h"
 #include "../dao/TeacherDao.h"
-#include "../utils/MD5Utils.h"
 #include <iostream>
 
 AuthService::AuthService()
@@ -31,14 +30,14 @@ LoginResult AuthService::login(const std::string &username, const std::string &p
     }
 
     // 对比密码
-    std::string encrypted_pwd = MD5Utils::encrypt(password);
+    std::string encrypted_pwd = password;
     if (encrypted_pwd != db_user.getPassword())
     {
         std::cerr << "登录失败：密码错误(用户名：" << username << ")" << std::endl;
         return LoginResult::PASSWORD_ERROR;
     }
 
-    //登录成功，返回用户信息
+    // 登录成功，返回用户信息
     out_user = db_user;
     std::cout << "登录成功：" << out_user.toString() << std::endl;
     return LoginResult::SUCCESS;
@@ -54,7 +53,7 @@ bool AuthService::resetPassword(const std::string &username, const std::string &
         return false;
     }
 
-    //查询用户
+    // 查询用户
     UserModel db_user = user_dao->selectByUsername(username);
     if (db_user.getId() == 0)
     {
@@ -62,15 +61,15 @@ bool AuthService::resetPassword(const std::string &username, const std::string &
         return false;
     }
 
-    //验证原密码
-    if (MD5Utils::encrypt(old_pwd) != db_user.getPassword())
+    // 验证原密码
+    if (old_pwd != db_user.getPassword())
     {
         std::cerr << "密码重置失败：原密码错误(用户名：" << username << ")" << std::endl;
         return false;
     }
 
     // 更新新密码
-    bool result = user_dao->updatePassword(db_user.getId(), MD5Utils::encrypt(new_pwd));
+    bool result = user_dao->updatePassword(db_user.getId(), new_pwd);
     if (result)
     {
         std::cout << "密码重置成功：用户名" << username << std::endl;

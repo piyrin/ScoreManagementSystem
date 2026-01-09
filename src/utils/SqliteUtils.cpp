@@ -103,7 +103,7 @@ bool SqliteUtils::createAllTables()
         CREATE TABLE IF NOT EXISTS user (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT NOT NULL UNIQUE,  -- 登录用户名唯一（学生/教师/管理员共用）
-            password TEXT NOT NULL,         -- MD5加密后的密码
+            password TEXT NOT NULL,         -- 密码
             role INTEGER NOT NULL,          -- 角色:1=管理员,2=教师,3=学生
             relatedId INTEGER NOT NULL,     -- 关联student.id(角色3)或teacher.id(角色2),管理员填1
             FOREIGN KEY (relatedId) REFERENCES student(id) ON DELETE SET NULL,
@@ -194,7 +194,6 @@ void SqliteUtils::checkAndCreateDefaultAdmin()
             if (count == 0)
             {
                 // 创建默认管理员: admin / 123456
-                // 123456 的 MD5 是 e10adc3949ba59abbe56e057f20f883e
                 std::string insertSql = "INSERT INTO user (username, password, role, relatedId) VALUES ('admin', '123456', 1, 1);";
                 executeUpdate(insertSql);
                 std::cout << "Default admin created: admin / 123456" << std::endl;

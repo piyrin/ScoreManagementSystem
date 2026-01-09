@@ -50,7 +50,7 @@ ScoreManagementSystem/
 │   ├── dao/             # 数据访问层 (Data Access Object)
 │   ├── network/         # HTTP 服务器实现
 │   ├── service/         # 业务逻辑层
-│   └── utils/           # 工具类 (Log, MD5, Sqlite)
+│   └── utils/           # 工具类 (Log, Sqlite)
 ├── CMakeLists.txt       # CMake 构建脚本
 ├── compile.bat          # 一键编译脚本
 └── start_server.bat     # 启动服务脚本

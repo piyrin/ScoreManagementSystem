@@ -1,5 +1,4 @@
 #include "AdminController.h"
-#include "../../utils/MD5Utils.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -229,7 +228,7 @@ void AdminController::updateUser(const HttpRequest &req, HttpResponse &res)
         }
         if (params.count("password") && !params["password"].empty())
         {
-            targetUser.setPassword(MD5Utils::encrypt(params["password"]));
+            targetUser.setPassword(params["password"]);
             userChanged = true;
         }
 
