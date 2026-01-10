@@ -54,7 +54,7 @@ bool SqliteUtils::executeUpdate(const std::string &sql)
     }
     // 存储错误信息
     char *errMsg = nullptr;
-    // 执行SQL,回调函数为nullptr，增删改不需要处理结果集
+    // 执行SQL,增删改不需要处理结果集
     int ret = sqlite3_exec(conn, sql.c_str(), nullptr, nullptr, &errMsg);
     if (ret != SQLITE_OK)
     {
@@ -89,7 +89,7 @@ sqlite3 *SqliteUtils::getDbConnection()
     return conn;
 }
 
-// 实现自动建表方法（按依赖顺序建表，无外键→有外键）
+// 自动建表
 bool SqliteUtils::createAllTables()
 {
     if (conn == nullptr)
@@ -158,7 +158,6 @@ bool SqliteUtils::createAllTables()
             courseId INTEGER NOT NULL,       -- 关联课程id(course表)
             teacherId INTEGER NOT NULL,      -- 关联授课教师id(teacher表)
             score REAL NOT NULL,             -- 分数(支持小数,如85.5)
-            -- 外键约束:删除关联数据时,成绩记录保留(可根据需求调整为ON DELETE CASCADE)
             FOREIGN KEY (studentId) REFERENCES student(id) ON DELETE RESTRICT,
             FOREIGN KEY (courseId) REFERENCES course(id) ON DELETE RESTRICT,
             FOREIGN KEY (teacherId) REFERENCES teacher(id) ON DELETE RESTRICT,

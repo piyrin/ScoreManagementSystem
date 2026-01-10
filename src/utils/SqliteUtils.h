@@ -31,10 +31,10 @@ public:
     //获取实例指针
     static SqliteUtils *getInstance();
 
-    //接口1：执行[增/删/改]sql(如插入用户，修改成绩)
+    //执行[增/删/改]sql(如插入用户，修改成绩)
     bool executeUpdate(const std::string &sql);
 
-    //接口2：查询sql（如查成绩，查用户信息）
+    //查询sql（如查成绩，查用户信息）
     bool executeQuery(const std::string &sql, int (*callback)(void *, int, char **, char **));
 
     // 辅助接口：获取数据库连接句柄

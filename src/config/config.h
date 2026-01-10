@@ -29,11 +29,10 @@ class Config
         void loadIni(const string &ini_path = "conf/server.ini");
 
     public:
-        //避免复制构造和赋值
         Config(const Config&) = delete;
         Config &operator=(const Config&) = delete;
 
-        //获取单例实例
+        //获取实例
         static Config *getInstance();
 
         //获取配置
